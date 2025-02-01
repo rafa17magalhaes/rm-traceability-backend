@@ -10,7 +10,7 @@ export class Company {
   code: string;
 
   @Column()
-  document: string; // ex: CNPJ, CPF, etc.
+  document: string;
 
   @Column()
   name: string; // Razão social
@@ -27,7 +27,6 @@ export class Company {
   @Column({ default: true })
   active: boolean;
 
-  // Campos de endereço incluídos diretamente na Company
   @Column({ name: 'zip_code', nullable: true })
   zipCode?: string;
 
