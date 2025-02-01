@@ -1,4 +1,3 @@
-// src/companies/companies.controller.ts
 import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
 import { CompaniesService } from '../services/companies.service';
 import { Company } from '../entities/company.entity';
