@@ -1,4 +1,3 @@
-// src/users/controllers/active-tokens.controller.ts
 import { Controller, Post, Body, Patch } from '@nestjs/common';
 import { ActiveTokensService } from '../services/active-tokens.service';
 

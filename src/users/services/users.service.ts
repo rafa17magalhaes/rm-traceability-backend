@@ -1,4 +1,3 @@
-// src/users/services/users.service.ts
 import { Injectable, NotFoundException, ConflictException, Inject } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
 import { User } from '../entities/user.entity';
@@ -15,7 +14,6 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { email, name, password, active } = createUserDto;
 
-    // Exemplo de checagem se já existe usuário com este e-mail
     const existing = await this.userRepository.findOne({ where: { email } });
     if (existing) {
       throw new ConflictException(`E-mail ${email} já cadastrado.`);
@@ -25,7 +23,7 @@ export class UsersService {
       name,
       email,
       active: active !== undefined ? active : true,
-      password, // esse "password" será hashado pelo hook @BeforeInsert
+      password,
     });
 
     await this.userRepository.save(user);
@@ -51,10 +49,8 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
 
-    // Atualiza campos que vierem no DTO
     Object.assign(user, updateUserDto);
 
-    // Se "password" vier no DTO, o hook do @BeforeUpdate() gerará novo hash
     await this.userRepository.save(user);
     return user;
   }

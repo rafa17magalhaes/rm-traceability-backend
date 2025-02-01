@@ -32,34 +32,18 @@ export class User {
   @Column({ default: true })
   active: boolean;
 
-  /**
-   * Campo transitório que usaremos para gerar o hash
-   * (não vai para o banco, então não tem @Column).
-   */
   password?: string;
-
-  /**
-   * Se precisar de “confirmPassword” em memória, adicione aqui também.
-   * Não armazenamos isso em banco.
-   */
-  // confirmPassword?: string;
 
   @Exclude()
   @Column({ name: 'password_hash', nullable: true })
   passwordHash: string;
 
-  /**
-   * Caso você use tokens relacionados ao usuário:
-   */
   @OneToMany(() => ActiveToken, (activeToken) => activeToken.user, {
     cascade: true,
     nullable: true,
   })
   activeTokens?: ActiveToken[];
 
-  /**
-   * Relação com Company
-   */
   @Column({ name: 'company_id', nullable: true })
   companyId?: string;
 

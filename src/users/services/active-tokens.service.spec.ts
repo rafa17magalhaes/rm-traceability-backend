@@ -1,4 +1,3 @@
-// src/users/services/active-tokens.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { ActiveTokensService } from './active-tokens.service';
 import { ActiveTokenRepository } from '../repositories/active-token.repository';

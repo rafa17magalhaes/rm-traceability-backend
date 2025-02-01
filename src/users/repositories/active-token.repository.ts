@@ -1,5 +1,3 @@
-// src/users/repositories/active-token.repository.ts
-
 import { EntityRepository, Repository, MoreThanOrEqual } from 'typeorm';
 import { ActiveToken } from '../entities/active-token.entity';
 import * as crypto from 'crypto';
@@ -12,7 +10,7 @@ export class ActiveTokenRepository extends Repository<ActiveToken> {
       where: { code },
       relations: ['user'],
     });
-    return token ?? null; // Converte undefined para null
+    return token ?? null;
   }
 
   async findValidToken(code: string): Promise<ActiveToken | null> {
@@ -24,14 +22,14 @@ export class ActiveTokenRepository extends Repository<ActiveToken> {
       },
       relations: ['user'],
     });
-    return token ?? null; // Converte undefined para null
+    return token ?? null;
   }
 
   async createToken(userId: string): Promise<ActiveToken> {
     const token = this.create({
       userId,
       code: crypto.randomBytes(5).toString('hex'),
-      expires: addDays(new Date(), 1), // 1 dia de validade
+      expires: addDays(new Date(), 1),
       used: false,
     });
     return this.save(token);
