@@ -4,7 +4,7 @@ import { Company } from 'src/companies/entities/company.entity';
 import { ActiveToken } from 'src/users/entities/active-token.entity';
 import { config } from 'dotenv';
 
-config(); // Carrega .env
+config();
 
 const ormconfigDev: ConnectionOptions = {
   type: 'postgres',
@@ -19,5 +19,4 @@ const ormconfigDev: ConnectionOptions = {
   logging: false,
 };
 
-// Export estilo commonjs (forma mais segura de o CLI 0.2.x ler):
 export = ormconfigDev;
