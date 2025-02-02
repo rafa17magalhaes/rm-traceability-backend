@@ -9,7 +9,6 @@ describe('CompaniesService', () => {
   let repositoryMock: jest.Mocked<CompanyRepository>;
 
   beforeEach(async () => {
-    // Mock do repository
     const mockRepository = {
       create: jest.fn(),
       save: jest.fn(),
