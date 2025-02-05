@@ -12,21 +12,17 @@ export class AuthService {
   ) {}
 
   // Método chamado pela LocalStrategy
-  async validateUser(email: string, pass: string): Promise<User> {
-    const user = await this.usersService.findByEmail(email);
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-    const passwordIsValid = await user.checkPassword(pass);
-    if (!passwordIsValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+async validateUser(email: string, password: string): Promise<any> {
+  const user = await this.usersService.findByEmail(email);
+  if (user && await user.checkPassword(password)) {
     return user;
   }
+  return null;
+}
 
   // Quando o usuário é validado, geramos o token
   async login(user: User) {
-    const payload = { sub: user.id }; // sub = subject
+    const payload = { sub: user.id };
     return {
       accessToken: this.jwtService.sign(payload),
     };

@@ -10,7 +10,6 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Request() req) {
-    // Se passou pelo guard, req.user está definido
     return this.authService.login(req.user);
   }
 }
