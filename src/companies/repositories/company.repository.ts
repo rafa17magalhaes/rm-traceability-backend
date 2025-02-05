@@ -1,10 +1,8 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Company } from '../entities/company.entity';
 
-@EntityRepository(Company)
-export class CompanyRepository extends Repository<Company> {
-  async findActiveCompanies(): Promise<Company[]> {
+export const CompanyRepository = (Repository as any).extend({
+  async findActiveCompanies(this: Repository<Company>): Promise<Company[]> {
     return this.find({ where: { active: true } });
-  }
-}
-  
+  },
+});

@@ -1,51 +1,22 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { CompanyRepository } from '../repositories/company.repository';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { Company } from '../entities/company.entity';
 import { CreateCompanyDto } from '../dtos/create-company.dto';
 import { UpdateCompanyDto } from '../dtos/update-company.dto';
-import { Company } from '../entities/company.entity';
+
+export type CompanyRepositoryType = Repository<Company> & {
+  findActiveCompanies(): Promise<Company[]>;
+};
 
 @Injectable()
 export class CompaniesService {
   constructor(
-    @Inject(CompanyRepository)
-    private readonly companyRepository: CompanyRepository,
+    @Inject('CompanyRepository')
+    private readonly companyRepository: CompanyRepositoryType,
   ) {}
 
   async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
-    const {
-      code,
-      document,
-      name,
-      trade,
-      municipalRegistration,
-      stateRegistration,
-      active,
-      zipCode,
-      street,
-      complement,
-      number,
-      neighborhood,
-      city,
-      state,
-    } = createCompanyDto;
-
-    const company = this.companyRepository.create({
-      code,
-      document,
-      name,
-      trade,
-      municipalRegistration,
-      stateRegistration,
-      active: active !== undefined ? active : true,
-      zipCode,
-      street,
-      complement,
-      number,
-      neighborhood,
-      city,
-      state,
-    });
-
+    const company = this.companyRepository.create(createCompanyDto);
     return this.companyRepository.save(company);
   }
 
@@ -60,12 +31,10 @@ export class CompaniesService {
     }
     return company;
   }
-  
+
   async update(id: string, updateCompanyDto: UpdateCompanyDto): Promise<Company> {
     const company = await this.findOne(id);
-
     Object.assign(company, updateCompanyDto);
-
     return this.companyRepository.save(company);
   }
 
@@ -74,5 +43,9 @@ export class CompaniesService {
     if (result.affected === 0) {
       throw new NotFoundException(`Empresa com ID ${id} não encontrada.`);
     }
+  }
+
+  async findActiveCompanies(): Promise<Company[]> {
+    return this.companyRepository.findActiveCompanies();
   }
 }

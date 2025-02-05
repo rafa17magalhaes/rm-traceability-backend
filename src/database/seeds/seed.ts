@@ -1,20 +1,20 @@
-import { createConnection, Connection, Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { Company } from 'src/companies/entities/company.entity';
 import { User } from 'src/users/entities/user.entity';
 import ormconfig from 'src/config/ormconfig';
 
 export async function seed(): Promise<void> {
   console.log('Iniciando seed...');
-  const connection: Connection = await createConnection(ormconfig);
+  const dataSource = new DataSource(ormconfig);
+  await dataSource.initialize();
   console.log('Conexão estabelecida.');
 
   try {
-    const companyRepo: Repository<Company> = connection.getRepository(Company);
-    const userRepo: Repository<User> = connection.getRepository(User);
+    const companyRepo = dataSource.getRepository(Company);
+    const userRepo = dataSource.getRepository(User);
 
     let existingCompany = await companyRepo.findOne({ where: { name: 'Smart Invisible' } });
     if (!existingCompany) {
-      // Cria uma nova empresa
       existingCompany = companyRepo.create({
         code: 'SMART123',
         document: '000000000',
@@ -36,15 +36,17 @@ export async function seed(): Promise<void> {
         password: '123456',
         company: existingCompany,
       });
-      await userRepo.save(newUser);
-      console.log('Usuário criado.');
+      const savedUser = await userRepo.save(newUser);
+      console.log('Usuário criado:', savedUser);
     } else {
       console.log('Usuário já existe.');
     }
   } catch (error) {
     console.error('Erro durante o seed:', error);
   } finally {
-    await connection.close();
+    await dataSource.destroy();
     console.log('Conexão fechada.');
   }
 }
+
+seed().catch((err) => console.error(err));

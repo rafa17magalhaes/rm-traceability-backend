@@ -1,4 +1,4 @@
-import { ConnectionOptions } from 'typeorm';
+import { DataSourceOptions } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Company } from 'src/companies/entities/company.entity';
 import { ActiveToken } from 'src/users/entities/active-token.entity';
@@ -6,7 +6,7 @@ import { config } from 'dotenv';
 
 config();
 
-const ormconfig: ConnectionOptions = {
+const ormconfig: DataSourceOptions = {
   type: 'postgres',
   host: process.env.DB_HOST,
   port: parseInt(process.env.DB_PORT || '5432', 10),
@@ -15,7 +15,7 @@ const ormconfig: ConnectionOptions = {
   database: process.env.DB_NAME,
   entities: [User, Company, ActiveToken],
   migrations: ['src/database/migrations/*.ts'],
-  synchronize: false,
+  synchronize: false,  // Altere para false em prod
   logging: false,
 };
 
