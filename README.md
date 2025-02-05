@@ -32,7 +32,7 @@ O **RM Traceability SaaS** é uma solução para o gerenciamento de empresas com
 
 ## Configuração do Ambiente
 
-Crie um arquivo `.env` na raiz do projeto com o seguinte conteúdo (ajuste conforme necessário):
+Crie um arquivo `.env` a patir do .env.example na raiz do projeto com o seguinte conteúdo (ajuste conforme necessário):
 
 ## Instalação
 Instale as dependências do projeto utilizando o Yarn
@@ -53,12 +53,10 @@ O sistema inclui um script de seed que preenche o banco de dados com dados inici
 
 yarn run seed
 
-
 ## Testes Unitários
 O projeto conta com testes unitários e ponta a ponta. Utilize os seguintes comandos:
 
 yarn run test
-
 
 # Testes de ponta a ponta (E2E)
 yarn run test:e2e
@@ -70,11 +68,11 @@ yarn run test:cov
 
 ### Criar a network
 
-docker network create track-network
+docker network create
 
 Via Docker, utilize o arquivo docker-compose.yml
 
-docker-compose up
+docker-compose up --build
 
 ## Contato
 Suporte e Dúvidas: Entre em contato através do Discord ou abra um issue no repositório.
