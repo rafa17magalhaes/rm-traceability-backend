@@ -1,9 +1,8 @@
-import { EntityRepository, Repository, MoreThanOrEqual } from 'typeorm';
+import { Repository, MoreThanOrEqual } from 'typeorm';
 import { ActiveToken } from '../entities/active-token.entity';
 import * as crypto from 'crypto';
 import { addDays } from 'date-fns';
 
-@EntityRepository(ActiveToken)
 export class ActiveTokenRepository extends Repository<ActiveToken> {
   async findByCode(code: string): Promise<ActiveToken | null> {
     const token = await this.findOne({

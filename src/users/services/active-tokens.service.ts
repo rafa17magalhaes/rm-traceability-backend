@@ -1,30 +1,22 @@
-import {
-  Injectable,
-  BadRequestException,
-  NotFoundException,
-  Inject,
-} from '@nestjs/common';
-import { ActiveTokenRepository } from '../repositories/active-token.repository';
+import { Injectable, BadRequestException, NotFoundException, Inject } from '@nestjs/common';
+import { isAfter } from 'date-fns';
 import { UsersService } from './users.service';
 import { User } from '../entities/user.entity';
 import { ActiveToken } from '../entities/active-token.entity';
-import { isAfter } from 'date-fns';
+import { ActiveTokenRepositoryType } from '../interfaces/active-token-repository.type';
 
 @Injectable()
 export class ActiveTokensService {
   constructor(
-    @Inject(ActiveTokenRepository)
-    private activeTokenRepository: ActiveTokenRepository,
-
+    @Inject('ActiveTokenRepository')
+    private activeTokenRepository: ActiveTokenRepositoryType,
     private readonly usersService: UsersService,
   ) {}
 
   async resendToken(userId: string): Promise<ActiveToken> {
     const user = await this.usersService.findOne(userId);
     if (!user || !user.active) {
-      throw new BadRequestException(
-        `Cannot resend token to an inactive or nonexisting user`,
-      );
+      throw new BadRequestException('Cannot resend token to an inactive or nonexisting user');
     }
     const token = await this.activeTokenRepository.createToken(userId);
     return token;
