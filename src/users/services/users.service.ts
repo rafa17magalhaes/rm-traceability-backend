@@ -3,10 +3,7 @@ import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { UpdateUserDto } from '../dtos/update-user.dto';
-
-export type UserRepositoryType = Repository<User> & {
-  findActive(): Promise<User[]>;
-};
+import { UserRepositoryType } from '../interfaces/user-repository.type';
 
 @Injectable()
 export class UsersService {

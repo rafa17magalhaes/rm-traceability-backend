@@ -1,13 +1,12 @@
-// src/users/services/users.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { UserRepository } from '../repositories/user.repository';
 import { NotFoundException, ConflictException } from '@nestjs/common';
 import { User } from '../entities/user.entity';
+import { UserRepositoryType } from '../interfaces/user-repository.type';
 
 describe('UsersService', () => {
   let service: UsersService;
-  let repoMock: jest.Mocked<UserRepository>;
+  let repoMock: jest.Mocked<UserRepositoryType>;
 
   beforeEach(async () => {
     const mockRepo = {
@@ -16,20 +15,21 @@ describe('UsersService', () => {
       find: jest.fn(),
       findOne: jest.fn(),
       delete: jest.fn(),
+      findActive: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
         {
-          provide: UserRepository,
+          provide: 'UserRepository',
           useValue: mockRepo,
         },
       ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
-    repoMock = module.get<UserRepository>(UserRepository) as jest.Mocked<UserRepository>;
+    repoMock = module.get<UserRepositoryType>('UserRepository') as jest.Mocked<UserRepositoryType>;
   });
 
   it('should be defined', () => {
@@ -46,7 +46,7 @@ describe('UsersService', () => {
     });
 
     it('deve criar usuário se e-mail ainda não existir', async () => {
-      repoMock.findOne.mockResolvedValue(undefined);
+      repoMock.findOne.mockResolvedValue(null);
       repoMock.create.mockReturnValue({ id: 'uuid-2' } as User);
       repoMock.save.mockResolvedValue({ id: 'uuid-2' } as User);
 
@@ -60,7 +60,7 @@ describe('UsersService', () => {
 
   describe('findOne', () => {
     it('deve lançar NotFoundException se não encontrar', async () => {
-      repoMock.findOne.mockResolvedValue(undefined);
+      repoMock.findOne.mockResolvedValue(null);
       await expect(service.findOne('invalido')).rejects.toThrow(NotFoundException);
     });
   });

@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ActiveTokensService } from './active-tokens.service';
-import { ActiveTokenRepository } from '../repositories/active-token.repository';
 import { UsersService } from './users.service';
-import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { ActiveTokenRepositoryType } from '../interfaces/active-token-repository.type';
 
 describe('ActiveTokensService', () => {
   let service: ActiveTokensService;
-  let repoMock: jest.Mocked<ActiveTokenRepository>;
+  let repoMock: jest.Mocked<ActiveTokenRepositoryType>;
   let usersServiceMock: jest.Mocked<UsersService>;
 
   beforeEach(async () => {
@@ -14,7 +14,7 @@ describe('ActiveTokensService', () => {
       providers: [
         ActiveTokensService,
         {
-          provide: ActiveTokenRepository,
+          provide: 'ActiveTokenRepository',
           useValue: {
             createToken: jest.fn(),
             findByCode: jest.fn(),
@@ -32,8 +32,8 @@ describe('ActiveTokensService', () => {
     }).compile();
 
     service = module.get<ActiveTokensService>(ActiveTokensService);
-    repoMock = module.get(ActiveTokenRepository) as jest.Mocked<ActiveTokenRepository>;
-    usersServiceMock = module.get(UsersService) as jest.Mocked<UsersService>;
+    repoMock = module.get<ActiveTokenRepositoryType>('ActiveTokenRepository') as jest.Mocked<ActiveTokenRepositoryType>;
+    usersServiceMock = module.get<UsersService>(UsersService) as jest.Mocked<UsersService>;
   });
 
   it('should be defined', () => {

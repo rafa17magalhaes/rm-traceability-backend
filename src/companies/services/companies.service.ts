@@ -3,10 +3,7 @@ import { Repository } from 'typeorm';
 import { Company } from '../entities/company.entity';
 import { CreateCompanyDto } from '../dtos/create-company.dto';
 import { UpdateCompanyDto } from '../dtos/update-company.dto';
-
-export type CompanyRepositoryType = Repository<Company> & {
-  findActiveCompanies(): Promise<Company[]>;
-};
+import { CompanyRepositoryType } from '../interfaces/companies-repository.type';
 
 @Injectable()
 export class CompaniesService {

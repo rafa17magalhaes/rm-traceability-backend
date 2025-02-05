@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CompaniesService } from './companies.service';
-import { CompanyRepository } from '../repositories/company.repository';
 import { NotFoundException } from '@nestjs/common';
 import { Company } from '../entities/company.entity';
+import { CompanyRepositoryType } from '../interfaces/companies-repository.type';
 
 describe('CompaniesService', () => {
   let service: CompaniesService;
-  let repositoryMock: jest.Mocked<CompanyRepository>;
+  let repositoryMock: jest.Mocked<CompanyRepositoryType>;
 
   beforeEach(async () => {
     const mockRepository = {
@@ -15,22 +15,21 @@ describe('CompaniesService', () => {
       find: jest.fn(),
       findOne: jest.fn(),
       delete: jest.fn(),
+      findActiveCompanies: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CompaniesService,
         {
-          provide: CompanyRepository,
+          provide: 'CompanyRepository',
           useValue: mockRepository,
         },
       ],
     }).compile();
 
     service = module.get<CompaniesService>(CompaniesService);
-    repositoryMock = module.get<CompanyRepository>(
-      CompanyRepository,
-    ) as jest.Mocked<CompanyRepository>;
+    repositoryMock = module.get<CompanyRepositoryType>('CompanyRepository') as jest.Mocked<CompanyRepositoryType>;
   });
 
   it('should be defined', () => {
@@ -65,7 +64,7 @@ describe('CompaniesService', () => {
     });
 
     it('deve disparar NotFoundException se não encontrar', async () => {
-      repositoryMock.findOne.mockResolvedValue(undefined);
+      repositoryMock.findOne.mockResolvedValue(null);
 
       await expect(service.findOne('invalido')).rejects.toThrow(NotFoundException);
     });
