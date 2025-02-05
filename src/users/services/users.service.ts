@@ -1,31 +1,32 @@
 import { Injectable, NotFoundException, ConflictException, Inject } from '@nestjs/common';
-import { UserRepository } from '../repositories/user.repository';
+import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { UpdateUserDto } from '../dtos/update-user.dto';
 
+export type UserRepositoryType = Repository<User> & {
+  findActive(): Promise<User[]>;
+};
+
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject(UserRepository)
-    private userRepository: UserRepository,
+    @Inject('UserRepository')
+    private readonly userRepository: UserRepositoryType,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { email, name, password, active } = createUserDto;
-
     const existing = await this.userRepository.findOne({ where: { email } });
     if (existing) {
       throw new ConflictException(`E-mail ${email} já cadastrado.`);
     }
-
     const user = this.userRepository.create({
       name,
       email,
       active: active !== undefined ? active : true,
       password,
     });
-
     await this.userRepository.save(user);
     return user;
   }
@@ -43,14 +44,13 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<User | undefined> {
-    return this.userRepository.findOne({ where: { email } });
-  }  
-  
+    const user = await this.userRepository.findOne({ where: { email } });
+    return user ?? undefined;
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
-
     Object.assign(user, updateUserDto);
-
     await this.userRepository.save(user);
     return user;
   }
@@ -60,5 +60,10 @@ export class UsersService {
     if (result.affected === 0) {
       throw new NotFoundException(`Usuário com ID ${id} não encontrado`);
     }
+  }
+
+  // Método customizado
+  async findActiveUsers(): Promise<User[]> {
+    return this.userRepository.findActive();
   }
 }

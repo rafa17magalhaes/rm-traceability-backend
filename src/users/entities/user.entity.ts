@@ -1,3 +1,4 @@
+// src/users/entities/user.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -32,13 +33,14 @@ export class User {
   @Column({ default: true })
   active: boolean;
 
+  @Column({ select: false, insert: false, update: false, nullable: true })
   password?: string;
 
   @Exclude()
   @Column({ name: 'password_hash', nullable: true })
   passwordHash: string;
 
-  @OneToMany(() => ActiveToken, (activeToken) => activeToken.user, {
+  @OneToMany(() => ActiveToken, activeToken => activeToken.user, {
     cascade: true,
     nullable: true,
   })
@@ -47,7 +49,7 @@ export class User {
   @Column({ name: 'company_id', nullable: true })
   companyId?: string;
 
-  @ManyToOne(() => Company, (company) => company.users, { eager: false })
+  @ManyToOne(() => Company, company => company.users, { eager: false })
   @JoinColumn({ name: 'company_id' })
   company?: Company;
 
@@ -67,6 +69,7 @@ export class User {
   public async hashPassword(): Promise<void> {
     if (this.password) {
       this.passwordHash = await bcrypt.hash(this.password, 8);
+      this.password = undefined;
     }
   }
 }
