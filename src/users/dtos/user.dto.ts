@@ -1,4 +1,4 @@
-import { CreateCompanyDto } from "src/companies/dtos/create-company.dto";
+import { CreateCompanyDTO } from "src/companies/dtos/create-company.dto";
 
 export class UserDTO {
     id?: string; 
@@ -9,6 +9,6 @@ export class UserDTO {
     active?: boolean;
     password: string;
     companyId?: string | null;
-    company?: CreateCompanyDto
+    company?: CreateCompanyDTO
   }
   

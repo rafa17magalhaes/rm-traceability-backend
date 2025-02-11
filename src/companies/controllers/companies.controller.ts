@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
 import { CompaniesService } from '../services/companies.service';
 import { Company } from '../entities/company.entity';
-import { CreateCompanyDto } from '../dtos/create-company.dto';
-import { UpdateCompanyDto } from '../dtos/update-company.dto';
+import { CreateCompanyDTO } from '../dtos/create-company.dto';
+import { UpdateCompanyDTO } from '../dtos/update-company.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('companies')
@@ -13,8 +13,8 @@ export class CompaniesController {
   @Post()
   @ApiOperation({ summary: 'Criar uma nova empresa' })
   @ApiResponse({ status: 201, description: 'Empresa criada com sucesso.', type: Company })
-  create(@Body() createCompanyDto: CreateCompanyDto): Promise<Company> {
-    return this.companiesService.create(createCompanyDto);
+  create(@Body() createCompanyDTO: CreateCompanyDTO): Promise<Company> {
+    return this.companiesService.create(createCompanyDTO);
   }
 
   @Get()
@@ -34,8 +34,8 @@ export class CompaniesController {
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar uma empresa existente' })
   @ApiResponse({ status: 200, description: 'Empresa atualizada com sucesso.', type: Company })
-  update(@Param('id') id: string, @Body() updateCompanyDto: UpdateCompanyDto): Promise<Company> {
-    return this.companiesService.update(id, updateCompanyDto);
+  update(@Param('id') id: string, @Body() updateCompanyDTO: UpdateCompanyDTO): Promise<Company> {
+    return this.companiesService.update(id, updateCompanyDTO);
   }
 
   @Delete(':id')

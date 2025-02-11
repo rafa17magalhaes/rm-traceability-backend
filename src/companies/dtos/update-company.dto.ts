@@ -1,4 +1,4 @@
-export class UpdateCompanyDto {
+export class UpdateCompanyDTO {
     code?: string;
     document?: string;
     name?: string;

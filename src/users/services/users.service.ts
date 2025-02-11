@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException, ConflictException, Inject } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
-import { CreateUserDto } from '../dtos/create-user.dto';
-import { UpdateUserDto } from '../dtos/update-user.dto';
+import { CreateUserDTO } from '../dtos/create-user.dto';
+import { UpdateUserDTO } from '../dtos/update-user.dto';
 import { UserRepositoryType } from '../interfaces/user-repository.type';
 
 @Injectable()
@@ -12,8 +12,8 @@ export class UsersService {
     private readonly userRepository: UserRepositoryType,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const { email, name, password, active } = createUserDto;
+  async create(CreateUserDTO: CreateUserDTO): Promise<User> {
+    const { email, name, password, active } = CreateUserDTO;
     const existing = await this.userRepository.findOne({ where: { email } });
     if (existing) {
       throw new ConflictException(`E-mail ${email} já cadastrado.`);
@@ -45,9 +45,9 @@ export class UsersService {
     return user ?? undefined;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(id: string, UpdateUserDTO: UpdateUserDTO): Promise<User> {
     const user = await this.findOne(id);
-    Object.assign(user, updateUserDto);
+    Object.assign(user, UpdateUserDTO);
     await this.userRepository.save(user);
     return user;
   }

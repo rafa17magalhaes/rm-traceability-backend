@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Company } from '../entities/company.entity';
-import { CreateCompanyDto } from '../dtos/create-company.dto';
-import { UpdateCompanyDto } from '../dtos/update-company.dto';
+import { CreateCompanyDTO } from '../dtos/create-company.dto';
+import { UpdateCompanyDTO } from '../dtos/update-company.dto';
 import { CompanyRepositoryType } from '../interfaces/companies-repository.type';
 
 @Injectable()
@@ -12,8 +12,8 @@ export class CompaniesService {
     private readonly companyRepository: CompanyRepositoryType,
   ) {}
 
-  async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
-    const company = this.companyRepository.create(createCompanyDto);
+  async create(CreateCompanyDTO: CreateCompanyDTO): Promise<Company> {
+    const company = this.companyRepository.create(CreateCompanyDTO);
     return this.companyRepository.save(company);
   }
 
@@ -29,9 +29,9 @@ export class CompaniesService {
     return company;
   }
 
-  async update(id: string, updateCompanyDto: UpdateCompanyDto): Promise<Company> {
+  async update(id: string, UpdateCompanyDTO: UpdateCompanyDTO): Promise<Company> {
     const company = await this.findOne(id);
-    Object.assign(company, updateCompanyDto);
+    Object.assign(company, UpdateCompanyDTO);
     return this.companyRepository.save(company);
   }
 

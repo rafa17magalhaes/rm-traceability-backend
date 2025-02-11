@@ -1,4 +1,4 @@
-export class CreateCompanyDto {
+export class CreateCompanyDTO {
     code: string;
     document: string;
     name: string;
