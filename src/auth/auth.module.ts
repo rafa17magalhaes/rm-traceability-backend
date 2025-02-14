@@ -9,13 +9,9 @@ import { UsersModule } from 'src/users/users.module';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
-/**
- * Exemplo: no JwtModule você define a secret e o expiresIn.
- * Em produção, coloque a secret no .env
- */
 @Module({
   imports: [
-    UsersModule, // Para usar UsersService
+    UsersModule,
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'fallback-secret',
