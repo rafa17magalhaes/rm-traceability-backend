@@ -1,16 +1,19 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDTO } from '../dtos/create-user.dto';
 import { UpdateUserDTO } from '../dtos/update-user.dto';
 import { User } from '../entities/user.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() CreateUserDTO: CreateUserDTO): Promise<User> {
-    return this.usersService.create(CreateUserDTO);
+  async create(@Body() createUserDTO: CreateUserDTO, @Req() request): Promise<User> {
+    const companyId = request.user.companyId;
+    return await this.usersService.create(createUserDTO, companyId);
   }
 
   @Get()
@@ -24,8 +27,8 @@ export class UsersController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() UpdateUserDTO: UpdateUserDTO): Promise<User> {
-    return this.usersService.update(id, UpdateUserDTO);
+  update(@Param('id') id: string, @Body() updateUserDTO: UpdateUserDTO): Promise<User> {
+    return this.usersService.update(id, updateUserDTO);
   }
 
   @Delete(':id')

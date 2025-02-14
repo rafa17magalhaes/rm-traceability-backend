@@ -11,17 +11,27 @@ export class UsersService {
     private readonly userRepository: UserRepositoryType,
   ) {}
 
-  async create(CreateUserDTO: CreateUserDTO): Promise<User> {
-    const { email, name, password, active } = CreateUserDTO;
-    const existing = await this.userRepository.findOne({ where: { email } });
-    if (existing) {
+  async create(createUserDTO: CreateUserDTO, companyId: string): Promise<User> {
+    const { email, name, phone, password, active } = createUserDTO;
+    
+    // Verifica se já existe um usuário com o mesmo e-mail
+    const existingByEmail = await this.userRepository.findOne({ where: { email } });
+    if (existingByEmail) {
       throw new ConflictException(`E-mail ${email} já cadastrado.`);
+    }
+
+    // Verifica se já existe um usuário com o mesmo nome dentro da mesma empresa
+    const existingByName = await this.userRepository.findOne({ where: { name, companyId } });
+    if (existingByName) {
+      throw new ConflictException(`Nome ${name} já cadastrado para esta empresa.`);
     }
     const user = this.userRepository.create({
       name,
       email,
+      phone,
       active: active !== undefined ? active : true,
       password,
+      companyId,
     });
     await this.userRepository.save(user);
     return user;
