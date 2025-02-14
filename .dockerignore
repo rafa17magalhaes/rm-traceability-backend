@@ -1,0 +1,12 @@
+node_modules
+
+dist
+
+# Evita arquivos de controle de versão
+.git
+.gitignore
+
+# Arquivos de configuração locais que não devem ser enviados
+.env
+Dockerfile*
+docker-compose*.yml

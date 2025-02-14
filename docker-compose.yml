@@ -11,7 +11,7 @@ services:
       POSTGRES_DB: rastreabilidade_saas
       POSTGRES_INITDB_ARGS: "--auth-host md5 --auth-local md5"
     ports:
-      - "5433:5432"  # Host:5433 mapeia para o container na porta 5432
+      - "5433:5432"  # Mapeia 5433 do host para 5432 do container
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
@@ -20,7 +20,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: rm_traceability_app
     restart: unless-stopped
     environment:
@@ -32,13 +32,18 @@ services:
       JWT_SECRET: RmS@as2025!SecureJWTSecret
       APP_SECRET: dc55cd2760e51f279b2fdb66da91436d
       APP_PORT: 3001
+      NODE_ENV: development
     ports:
-     - "3001:3001"
+      - "3001:3001"
     depends_on:
       - db
     networks:
       - rm_traceability_network
-
+    volumes:
+      - .:/usr/src/app            # Mapeia o código local para dentro do container
+      - /usr/src/app/node_modules # Volume anônimo para não sobrescrever os node_modules do container
+    env_file:
+      - .env
 volumes:
   db_data:
 
