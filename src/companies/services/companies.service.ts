@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException, Inject } from '@nestjs/common';
-import { Repository } from 'typeorm';
 import { Company } from '../entities/company.entity';
 import { CreateCompanyDTO } from '../dtos/create-company.dto';
 import { UpdateCompanyDTO } from '../dtos/update-company.dto';
