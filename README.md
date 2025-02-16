@@ -1,6 +1,6 @@
 # RM Traceability SaaS
 
-O **RM Traceability SaaS** é uma solução para o gerenciamento de empresas com foco na rastreabilidade de produtos por meio de QR Code. O sistema permite que empresas cadastrem seus produtos e acompanhem sua trajetória, facilitando a identificação e o controle de cada item.
+O **RM Traceability SaaS** é uma solução para o gerenciamento de empresas com foco na rastreabilidade de produtos por meio de QR Code. O sistema permite que empresas cadastrem seus produtos, gerenciem seus recursos e acompanhem a trajetória de cada item, facilitando a identificação e o controle.
 
 ## Sumário
 
@@ -10,9 +10,10 @@ O **RM Traceability SaaS** é uma solução para o gerenciamento de empresas com
 - [Instalação](#instalação)
 - [Banco de Dados](#banco-de-dados)
   - [Migrações](#migrações)
-  - [Seed](#Semente)
-- [Testes](#testes-unitários)
-- [Docker](#Docker)
+  - [Semente](#semente)
+- [Testes Unitários e E2E](#testes-unitários-e-e2e)
+- [Swagger API](#swagger-api)
+- [Docker](#docker)
 - [Contato](#contato)
 
 ## Recursos
@@ -20,9 +21,10 @@ O **RM Traceability SaaS** é uma solução para o gerenciamento de empresas com
 - **Gerenciamento de Empresas:** Cadastro e manutenção de empresas.
 - **Rastreabilidade de Produtos:** Associação de produtos a empresas e geração de QR Codes para rastreamento.
 - **Controle de Usuários:** Gestão de usuários com autenticação e autorização.
-- **API RESTful:** Construída com [NestJS](https://docs.nestjs.com/) e [TypeORM](https://typeorm.io/).
+- **Gerenciamento de Recursos:** Cadastro, listagem, atualização e remoção de recursos associados a uma empresa.
+- **API RESTful:** Construída com [NestJS](https://docs.nestjs.com/) e [TypeORM](https://typeorm.io/), com endpoints documentados via Swagger.
 - **Banco de Dados PostgreSQL:** Integração robusta com suporte a migrações.
-- **Seeds Automatizados:** Popula o banco de dados com dados iniciais (empresa e usuário admin).
+- **Seeds Automatizados:** Popula o banco de dados com dados iniciais (empresa, usuário admin, recursos, etc.).
 
 ## Pré-requisitos
 
@@ -32,7 +34,8 @@ O **RM Traceability SaaS** é uma solução para o gerenciamento de empresas com
 
 ## Configuração do Ambiente
 
-Crie um arquivo `.env` a patir do .env.example na raiz do projeto com o seguinte conteúdo (ajuste conforme necessário):
+Crie um arquivo `.env` a partir do `.env.example` na raiz do projeto com o seguinte conteúdo (ajuste conforme necessário):
+
 
 ## Instalação
 Instale as dependências do projeto utilizando o Yarn
@@ -63,6 +66,15 @@ yarn run test:e2e
 
 # Cobertura de Testes
 yarn run test:cov
+
+# Swagger API
+
+*A documentação da API é gerada automaticamente via Swagger*
+
+Para acessar a documentação:
+
+Certifique-se de que o backend esteja rodando na porta configurada (por padrão, 3001).
+Acesse http://localhost:3001/api no navegador para visualizar a documentação interativa.
 
 ## Docker
 
