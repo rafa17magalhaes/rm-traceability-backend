@@ -1,4 +1,3 @@
-// src/auth/auth.service.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/services/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -20,11 +19,10 @@ async validateUser(email: string, password: string): Promise<any> {
   return null;
 }
 
-  // Quando o usuário é validado, geramos o token
-  async login(user: User) {
-    const payload = { sub: user.id };
-    return {
-      accessToken: this.jwtService.sign(payload),
-    };
-  }
+async login(user: User) {
+  const payload = { sub: user.id, companyId: user.companyId };
+  return {
+    accessToken: this.jwtService.sign(payload),
+  };
+ }
 }

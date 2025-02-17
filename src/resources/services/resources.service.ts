@@ -11,9 +11,9 @@ export class ResourcesService {
     private readonly resourceRepository: ResourceRepository,
   ) {}
 
-  async create(dto: CreateResourceDTO): Promise<Resource> {
-    const resource = this.resourceRepository.create(dto);
-    return this.resourceRepository.save(resource);
+  async create(dto: CreateResourceDTO & { companyId: string }): Promise<Resource> {
+  const resource = this.resourceRepository.create(dto);
+  return this.resourceRepository.save(resource);
   }
 
   async findAll(): Promise<Resource[]> {

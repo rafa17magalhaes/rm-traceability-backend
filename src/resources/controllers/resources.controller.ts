@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, Req, UseGuards } from '@nestjs/common';
 import { ResourcesService } from '../services/resources.service';
 import { Resource } from '../entities/resource.entity';
 import { CreateResourceDTO } from '../dtos/create-resource.dto';
 import { UpdateResourceDTO } from '../dtos/update-resource.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ExpressUserRequest, UserPayload } from 'src/auth/types/ExpressUserRequest';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @ApiTags('resources')
 @Controller('resources')
@@ -13,10 +15,13 @@ export class ResourcesController {
   @Post()
   @ApiOperation({ summary: 'Criar um novo recurso' })
   @ApiResponse({ status: 201, description: 'Recurso criado com sucesso.', type: Resource })
-  create(@Body() dto: CreateResourceDTO): Promise<Resource> {
-    return this.resourcesService.create(dto);
+  @UseGuards(JwtAuthGuard)
+  async create(@Body() dto: CreateResourceDTO, @Req() request: ExpressUserRequest): Promise<Resource> {
+    const user = request.user as UserPayload;
+    const companyId = user.companyId;
+    return this.resourcesService.create({ ...dto, companyId });
   }
-
+  
   @Get()
   @ApiOperation({ summary: 'Listar todos os recursos' })
   @ApiResponse({ status: 200, description: 'Lista de recursos.', type: [Resource] })
