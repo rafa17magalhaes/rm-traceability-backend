@@ -5,6 +5,7 @@ import { CompaniesModule } from './companies/companies.module';
 import { UsersModule } from './users/users.module';
 import { ResourcesModule } from './resources/resources.module';
 import { EventsModule } from './events/events.module';
+import { StatusModule } from './status/status.module';
 import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -30,6 +31,7 @@ import { AppService } from './app.service';
       }),
     }),
     CompaniesModule,
+    StatusModule,
     UsersModule,
     ResourcesModule,
     EventsModule,
