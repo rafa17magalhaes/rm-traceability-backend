@@ -1,7 +1,7 @@
 export class UpdateResourceDTO {
     name?: string;
     description?: string;
-    active?: boolean;
+    active?: boolean | string;
     imageUrl?: string;
   }
   
