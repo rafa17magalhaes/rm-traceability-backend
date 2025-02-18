@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export class CreateResourcesTable1739759642984 implements MigrationInterface {
+export class CreateResourcesTable1739831581321 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
@@ -33,6 +33,11 @@ export class CreateResourcesTable1739759642984 implements MigrationInterface {
             name: 'company_id',
             type: 'varchar',
             isNullable: false,
+          },
+          {
+            name: 'image_url',
+            type: 'varchar',
+            isNullable: true,
           },
         ],
         uniques: [

@@ -1,5 +1,3 @@
-// src/resources/repositories/resource.repository.ts
-
 import { DataSource, Repository } from 'typeorm';
 import { Resource } from '../entities/resource.entity';
 
