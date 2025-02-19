@@ -4,11 +4,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CompaniesModule } from './companies/companies.module';
 import { UsersModule } from './users/users.module';
 import { ResourcesModule } from './resources/resources.module';
-import { EventsModule } from './events/events.module';
 import { StatusModule } from './status/status.module';
 import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { EventModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -34,7 +34,7 @@ import { AppService } from './app.service';
     StatusModule,
     UsersModule,
     ResourcesModule,
-    EventsModule,
+    EventModule,
     AuthModule,
   ],
   controllers: [AppController],
