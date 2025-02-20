@@ -18,20 +18,28 @@ export class CodeService {
     if (!dto.qrCodeUrl && dto.value) {
       dto.qrCodeUrl = await this.generateQrCodeUrl(dto.value);
     }
-
     const code = this.codeRepository.create(dto);
     return this.codeRepository.save(code);
   }
 
-  /**
-   * Retorna todos os códigos
-   */
+  // Retorna todos os códigos
   async findAll(): Promise<Code[]> {
     return this.codeRepository.find();
   }
-
+    /**
+   * Método auxiliar para gerar uma string aleatória com prefixo
+   */
+    private generateCodeValue(prefix: string): string {
+      const usedPrefix = (prefix || 'RM7');
+      
+      const randomHex = crypto.randomBytes(4).toString('hex').toUpperCase();
+      
+      const neededHex = randomHex.slice(0, 7);
+    
+      return `${usedPrefix}${neededHex}`;
+    }     
   /**
-   * Gera vários códigos em lote
+   * Gera códigos em lote
    */
   async bulkGenerateCodes(dto: BulkGenerateCodesDTO): Promise<Code[]> {
     const { quantity, prefix } = dto;
@@ -42,8 +50,7 @@ export class CodeService {
 
       const createDto: CreateCodeDTO = {
         value: codeValue,
-        statusId: undefined,
-        // setar companyId, eventId fixo
+        statusId: '2caca2b1-78dd-4ed9-a940-2cd72e91053c',
       };
 
       // Gera a url do QR code
@@ -56,17 +63,6 @@ export class CodeService {
     // Salva todos de uma vez só (melhor performance que 1 a 1)
     return this.codeRepository.save(generatedCodes);
   }
-  /**
-   * Método auxiliar para gerar uma string aleatória com prefixo
-   * Exemplo: "RM7-AF12BC"
-   */
-  private generateCodeValue(prefix: string): string {
-    // Gera bytes aleatórios
-    const randomBytes = crypto.randomBytes(3).toString('hex').toUpperCase(); 
-    // Ex: 'A1F0B2'
-    return `${prefix}-${randomBytes}`;
-  }
-
   /**
    * Gera a imagem do QR code e converte para DataURL (outra opção: gerar e subir em S3)
    */
