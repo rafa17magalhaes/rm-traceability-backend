@@ -56,6 +56,10 @@ O sistema inclui um script de seed que preenche o banco de dados com dados inici
 
 yarn run seed
 
+# Semente específica para Status sistemicos.
+
+yarn run seed:status
+
 ## Testes Unitários
 O projeto conta com testes unitários e ponta a ponta. Utilize os seguintes comandos:
 
