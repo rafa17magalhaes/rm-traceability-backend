@@ -13,6 +13,9 @@ import {
 
     @Column({ name: 'code_id' })
     codeId: string;
+
+    @Column()
+    value: string;
   
     @Column({ name: 'status_id', nullable: false })
     statusId: string;

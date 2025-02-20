@@ -6,37 +6,31 @@ const systemStatuses = [
     name: 'Gerado',
     description: 'Código gerado e aguardando ativação',
     active: true,
-    companyId: 'sistema',
   },
   {
     name: 'Ativado',
     description: 'Código ativado e em funcionamento',
     active: true,
-    companyId: 'sistema',
   },
   {
     name: 'Impressão',
     description: 'Código em processo de impressão',
     active: true,
-    companyId: 'sistema',
   },
   {
     name: 'Manutenção',
     description: 'Código em manutenção',
     active: true,
-    companyId: 'sistema',
   },
   {
     name: 'Extraviado',
     description: 'Código extraviado',
     active: true,
-    companyId: 'sistema',
   },
   {
     name: 'Avariado',
     description: 'Código com avaria',
     active: true,
-    companyId: 'sistema',
   },
 ];
 

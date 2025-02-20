@@ -20,6 +20,11 @@ export class CreateEventsTable1739921565891 implements MigrationInterface {
             isNullable: false,
           },
           {
+            name: 'valueCode',
+            type: 'varchar',
+            isUnique: true,
+          },
+          {
             name: 'status_id',
             type: 'uuid',
             isNullable: false,
@@ -40,15 +45,13 @@ export class CreateEventsTable1739921565891 implements MigrationInterface {
             isNullable: true,
           },
           {
-            name: 'creation_date',
+            name: 'created_at',
             type: 'timestamp',
-            isNullable: false,
             default: 'now()',
           },
           {
             name: 'updated_at',
             type: 'timestamp',
-            isNullable: false,
             default: 'now()',
           },
           {

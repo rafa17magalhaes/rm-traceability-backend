@@ -24,6 +24,9 @@ import {
     @Column({ name: 'company_id' })
     companyId: string;
 
+    @Column({ name: 'user_id'})
+    userId: string;
+
     @ManyToOne(() => Resource, { nullable: true })
     @JoinColumn({ name: 'resourceId' })
     resource?: Resource;

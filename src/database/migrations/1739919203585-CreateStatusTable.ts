@@ -32,7 +32,12 @@ export class CreateStatusTable1739919203585 implements MigrationInterface {
           {
             name: 'company_id',
             type: 'varchar',
-            isNullable: false,
+            isNullable: true,
+          },
+          {
+            name: 'user_id',
+            type: 'varchar',
+            isNullable: true,
           },
           {
             name: 'resourceId',
@@ -43,13 +48,11 @@ export class CreateStatusTable1739919203585 implements MigrationInterface {
             name: 'created_at',
             type: 'timestamp',
             default: 'now()',
-            isNullable: false,
           },
           {
             name: 'updated_at',
             type: 'timestamp',
             default: 'now()',
-            isNullable: false,
           },
         ],
         uniques: [
