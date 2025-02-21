@@ -1,9 +1,13 @@
+import { Company } from 'src/companies/entities/company.entity';
+import { Resource } from 'src/resources/entities/resource.entity';
+import { Status } from 'src/status/entities/status.entity';
+import { User } from 'src/users/entities/user.entity';
 import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
-    CreateDateColumn,
-    UpdateDateColumn,
+    ManyToOne,
+    JoinColumn,
   } from 'typeorm';
   
   @Entity({ name: 'events' })
@@ -15,25 +19,22 @@ import {
     codeId: string;
 
     @Column()
-    value: string;
+    valueCode: string;
   
+    @Column({ nullable: true })
+    ip: string;
+
     @Column({ name: 'status_id', nullable: false })
     statusId: string;
   
     @Column({ name: 'resource_id', nullable: true })
     resourceId: string;
-  
-    @Column({ nullable: true })
-    ip: string;
-  
+
     @Column({ name: 'companyid', nullable: true })
     companyId: string;
-  
-    @CreateDateColumn({ name: 'creation_date' })
-    creationDate: Date;
-  
-    @UpdateDateColumn({ name: 'updated_at' })
-    updatedAt: Date;
+
+    @Column({ name: 'user_id', nullable: true })
+    userId: string;
   
     @Column({ name: 'urlcode', nullable: true })
     urlCode: string;
@@ -46,8 +47,20 @@ import {
   
     @Column({ type: 'double precision', nullable: true })
     latitude: number;
-  
-    @Column({ name: 'user_id', nullable: true })
-    userId: string;
+
+    @ManyToOne(() => Status, { nullable: true })
+    @JoinColumn({ name: 'status_id' })
+    status?: Status;
+
+    @ManyToOne(() => Resource, { nullable: true })
+    @JoinColumn({ name: 'resource_id' })
+    resource?: Resource;
+
+    @ManyToOne(() => Company, { nullable: true })
+    @JoinColumn({ name: 'company_id' })
+    company?: Company;
+    
+    @ManyToOne(() => User, { nullable: true })
+    @JoinColumn({ name: 'user_id' })
+    user?: User;
   }
-  

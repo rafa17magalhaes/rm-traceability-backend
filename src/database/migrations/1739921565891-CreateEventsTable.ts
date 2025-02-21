@@ -16,7 +16,7 @@ export class CreateEventsTable1739921565891 implements MigrationInterface {
           },
           {
             name: 'code_id',
-            type: 'varchar',
+            type: 'uuid',
             isNullable: false,
           },
           {
@@ -40,8 +40,8 @@ export class CreateEventsTable1739921565891 implements MigrationInterface {
             isNullable: true,
           },
           {
-            name: 'companyid',
-            type: 'varchar',
+            name: 'company_id',
+            type: 'uuid',
             isNullable: true,
           },
           {
@@ -76,7 +76,7 @@ export class CreateEventsTable1739921565891 implements MigrationInterface {
           },
           {
             name: 'user_id',
-            type: 'varchar',
+            type: 'uuid',
             isNullable: true,
           },
         ],
@@ -84,6 +84,7 @@ export class CreateEventsTable1739921565891 implements MigrationInterface {
       true,
     );
 
+    // Foreign key para resource_id
     await queryRunner.createForeignKey(
       'events',
       new TableForeignKey({
@@ -91,9 +92,11 @@ export class CreateEventsTable1739921565891 implements MigrationInterface {
         referencedTableName: 'resources',
         referencedColumnNames: ['id'],
         onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
       }),
     );
 
+    // Foreign key para status_id
     await queryRunner.createForeignKey(
       'events',
       new TableForeignKey({
@@ -101,6 +104,31 @@ export class CreateEventsTable1739921565891 implements MigrationInterface {
         referencedTableName: 'status',
         referencedColumnNames: ['id'],
         onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      }),
+    );
+
+    // Foreign key para company_id
+    await queryRunner.createForeignKey(
+      'events',
+      new TableForeignKey({
+        columnNames: ['company_id'],
+        referencedTableName: 'companies',
+        referencedColumnNames: ['id'],
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      }),
+    );
+
+    // Foreign key para user_id
+    await queryRunner.createForeignKey(
+      'events',
+      new TableForeignKey({
+        columnNames: ['user_id'],
+        referencedTableName: 'users',
+        referencedColumnNames: ['id'],
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
       }),
     );
   }
@@ -108,6 +136,18 @@ export class CreateEventsTable1739921565891 implements MigrationInterface {
   public async down(queryRunner: QueryRunner): Promise<void> {
     const table = await queryRunner.getTable('events');
     if (table) {
+      const userForeignKey = table.foreignKeys.find(fk =>
+        fk.columnNames.includes('user_id'),
+      );
+      if (userForeignKey) {
+        await queryRunner.dropForeignKey('events', userForeignKey);
+      }
+      const companyForeignKey = table.foreignKeys.find(fk =>
+        fk.columnNames.includes('company_id'),
+      );
+      if (companyForeignKey) {
+        await queryRunner.dropForeignKey('events', companyForeignKey);
+      }
       const resourceForeignKey = table.foreignKeys.find(fk =>
         fk.columnNames.includes('resource_id'),
       );

@@ -31,16 +31,16 @@ export class CreateStatusTable1739919203585 implements MigrationInterface {
           },
           {
             name: 'company_id',
-            type: 'varchar',
+            type: 'uuid',
             isNullable: true,
           },
           {
             name: 'user_id',
-            type: 'varchar',
+            type: 'uuid',
             isNullable: true,
           },
           {
-            name: 'resourceId',
+            name: 'resource_id',
             type: 'uuid',
             isNullable: true,
           },
@@ -65,25 +65,65 @@ export class CreateStatusTable1739919203585 implements MigrationInterface {
       true,
     );
 
+    // Cria FK para resource_id (referenciando resources)
     await queryRunner.createForeignKey(
       'status',
       new TableForeignKey({
-        columnNames: ['resourceId'],
+        columnNames: ['resource_id'],
         referencedTableName: 'resources',
         referencedColumnNames: ['id'],
         onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
       }),
     );
+
+    // Cria FK para user_id (referenciando users)
+    await queryRunner.createForeignKey(
+      'status',
+      new TableForeignKey({
+        columnNames: ['user_id'],
+        referencedTableName: 'users',
+        referencedColumnNames: ['id'],
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      }),
+    );
+
+        // Cria FK para company_id (referenciando users)
+        await queryRunner.createForeignKey(
+          'status',
+          new TableForeignKey({
+            columnNames: ['company_id'],
+            referencedTableName: 'companies',
+            referencedColumnNames: ['id'],
+            onDelete: 'SET NULL',
+            onUpdate: 'CASCADE',
+          }),
+        );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     const table = await queryRunner.getTable('status');
     if (table) {
-      const foreignKey = table.foreignKeys.find(fk => fk.columnNames.includes('resourceId'));
-      if (foreignKey) {
-        await queryRunner.dropForeignKey('status', foreignKey);
+      const resourceForeignKey = table.foreignKeys.find(
+        (fk) => fk.columnNames.indexOf('resource_id') !== -1,
+      );
+      if (resourceForeignKey) {
+        await queryRunner.dropForeignKey('status', resourceForeignKey);
       }
-      await queryRunner.dropTable('status');
+      const userForeignKey = table.foreignKeys.find(
+        (fk) => fk.columnNames.indexOf('user_id') !== -1,
+      );
+      if (userForeignKey) {
+        await queryRunner.dropForeignKey('status', userForeignKey);
+      }
+      const companyForeignKey = table.foreignKeys.find(
+        (fk) => fk.columnNames.indexOf('company_id') !== -1,
+      );
+      if (companyForeignKey) {
+        await queryRunner.dropForeignKey('status', companyForeignKey);
+      }
     }
+    await queryRunner.dropTable('status');
   }
 }

@@ -60,17 +60,48 @@ export class AddTimestampsToEntities1739911015539 implements MigrationInterface 
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    // Remover colunas em caso de rollback
-    await queryRunner.dropColumn('resources', 'created_at');
-    await queryRunner.dropColumn('resources', 'updated_at');
+    // resources
+    const resourcesTable = await queryRunner.getTable('resources');
+    if (resourcesTable) {
+      if (resourcesTable.findColumnByName('created_at')) {
+        await queryRunner.dropColumn('resources', 'created_at');
+      }
+      if (resourcesTable.findColumnByName('updated_at')) {
+        await queryRunner.dropColumn('resources', 'updated_at');
+      }
+    }
 
-    await queryRunner.dropColumn('companies', 'created_at');
-    await queryRunner.dropColumn('companies', 'updated_at');
+    // companies
+    const companiesTable = await queryRunner.getTable('companies');
+    if (companiesTable) {
+      if (companiesTable.findColumnByName('created_at')) {
+        await queryRunner.dropColumn('companies', 'created_at');
+      }
+      if (companiesTable.findColumnByName('updated_at')) {
+        await queryRunner.dropColumn('companies', 'updated_at');
+      }
+    }
 
-    await queryRunner.dropColumn('users', 'created_at');
-    await queryRunner.dropColumn('users', 'updated_at');
+    // users
+    const usersTable = await queryRunner.getTable('users');
+    if (usersTable) {
+      if (usersTable.findColumnByName('created_at')) {
+        await queryRunner.dropColumn('users', 'created_at');
+      }
+      if (usersTable.findColumnByName('updated_at')) {
+        await queryRunner.dropColumn('users', 'updated_at');
+      }
+    }
 
-    await queryRunner.dropColumn('active_tokens', 'created_at');
-    await queryRunner.dropColumn('active_tokens', 'updated_at');
+    // active_tokens
+    const activeTokensTable = await queryRunner.getTable('active_tokens');
+    if (activeTokensTable) {
+      if (activeTokensTable.findColumnByName('created_at')) {
+        await queryRunner.dropColumn('active_tokens', 'created_at');
+      }
+      if (activeTokensTable.findColumnByName('updated_at')) {
+        await queryRunner.dropColumn('active_tokens', 'updated_at');
+      }
+    }
   }
 }
