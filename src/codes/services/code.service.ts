@@ -1,17 +1,25 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { Code } from '../entities/code.entity';
 import { CodeRepositoryType } from '../interfaces/code-repository.type';
 import { CreateCodeDTO } from '../dtos/create-code.dto';
 import { BulkGenerateCodesDTO } from '../dtos/bulk-generate-codes.dto';
 import * as QRCode from 'qrcode';
-
 import * as crypto from 'crypto';
+import { EventRepositoryType } from 'src/events/interfaces/event-repository.type';
+import { StatusService } from 'src/status/services/status.service';
+import { CreateEventDTO } from 'src/events/dtos/create-event.dto';
 
 @Injectable()
 export class CodeService {
   constructor(
     @Inject('CodeRepository')
     private readonly codeRepository: CodeRepositoryType,
+
+    @Inject('EventRepository')
+    private readonly eventRepository: EventRepositoryType,
+
+    @Inject(StatusService)
+    private readonly statusService: StatusService,
   ) {}
 
   async create(dto: CreateCodeDTO): Promise<Code> {
@@ -22,24 +30,45 @@ export class CodeService {
     return this.codeRepository.save(code);
   }
 
-  // Retorna todos os códigos
   async findAll(): Promise<Code[]> {
-    return this.codeRepository.find();
+    return this.codeRepository.find({ relations: ['status', 'company', 'event', 'users'] });
   }
-    /**
-   * Método auxiliar para gerar uma string aleatória com prefixo
-   */
-    private generateCodeValue(prefix: string): string {
-      const usedPrefix = (prefix || 'RM7');
-      
-      const randomHex = crypto.randomBytes(4).toString('hex').toUpperCase();
-      
-      const neededHex = randomHex.slice(0, 7);
-    
-      return `${usedPrefix}${neededHex}`;
-    }     
+  
   /**
-   * Gera códigos em lote
+   * Altera o status de um código e registra um event correspondente.
+   */
+  async changeCodeStatus(
+    codeId: string,
+    newStatusId: string,
+    observation?: string,
+    userId?: string,
+  ): Promise<Code> {
+    const code = await this.codeRepository.findOne({ where: { id: codeId } });
+    if (!code) {
+      throw new NotFoundException(`Código não encontrado: ${codeId}`);
+    }
+
+    const createEventDto: CreateEventDTO = {
+      codeId: code.id,
+      valueCode: code.value,
+      statusId: newStatusId,
+      observation: observation ?? undefined,
+      userId: userId ?? undefined,
+      companyId: code.companyId,
+    };
+
+    const event = this.eventRepository.create(createEventDto);
+    await this.eventRepository.save(event);
+
+    code.statusId = newStatusId;
+    code.currentObservation = observation ?? '';
+
+    return this.codeRepository.save(code);
+  }
+
+  /**
+   * Gera códigos em lote e, para cada código gerado,
+   * busca dinamicamente o status "Gerado" e registra o evento correspondente.
    */
   async bulkGenerateCodes(dto: BulkGenerateCodesDTO): Promise<Code[]> {
     const { quantity, prefix } = dto;
@@ -50,24 +79,36 @@ export class CodeService {
 
       const createDto: CreateCodeDTO = {
         value: codeValue,
-        statusId: '2caca2b1-78dd-4ed9-a940-2cd72e91053c',
       };
 
-      // Gera a url do QR code
       createDto.qrCodeUrl = await this.generateQrCodeUrl(codeValue);
-
       const codeEntity = this.codeRepository.create(createDto);
-      generatedCodes.push(codeEntity);
+      // Salva o código criado
+      const savedCode = await this.codeRepository.save(codeEntity);
+
+      // Busca o status "Gerado" dinamicamente (pode filtrar também pelo companyId, se necessário)
+      const statusGerado = await this.statusService.findByName('Gerado', savedCode.companyId);
+      
+      // Registra o evento "Gerado" e atualiza o status do código
+      const updatedCode = await this.changeCodeStatus(
+        savedCode.id,
+        statusGerado.id,
+        'Código gerado por lote'
+      );
+      generatedCodes.push(updatedCode);
     }
 
-    // Salva todos de uma vez só (melhor performance que 1 a 1)
-    return this.codeRepository.save(generatedCodes);
+    return generatedCodes;
   }
-  /**
-   * Gera a imagem do QR code e converte para DataURL (outra opção: gerar e subir em S3)
-   */
+
+  private generateCodeValue(prefix: string): string {
+    const usedPrefix = prefix || 'RM7';
+    const randomHex = crypto.randomBytes(4).toString('hex').toUpperCase();
+    const neededHex = randomHex.slice(0, 7);
+    return `${usedPrefix}${neededHex}`;
+  }
+
   private async generateQrCodeUrl(codeValue: string): Promise<string> {
-    // Gera um DataURL (ex: 'data:image/png;base64,iVBOR...')
     return QRCode.toDataURL(codeValue);
   }
 }

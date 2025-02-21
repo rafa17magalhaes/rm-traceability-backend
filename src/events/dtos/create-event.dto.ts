@@ -1,5 +1,6 @@
 export class CreateEventDTO {
     codeId?: string;
+    valueCode: string;
     statusId: string;
     resourceId?: string;
     ip?: string;
