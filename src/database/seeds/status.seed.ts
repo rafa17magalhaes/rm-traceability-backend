@@ -32,6 +32,26 @@ const systemStatuses = [
     description: 'Código com avaria',
     active: true,
   },
+  {
+    name: 'Em transporte',
+    description: 'Código em transporte',
+    active: true,
+  },
+  {
+    name: 'Disponível',
+    description: 'Código disponível para transporte',
+    active: true,
+  },
+  {
+    name: 'Transferência de custódia',
+    description: 'Transferência de produtos entre empresas',
+    active: true,
+  },
+  {
+    name: 'Entrada',
+    description: 'Produto transferido para nova custódia',
+    active: true,
+  },
 ];
 
 export async function seedStatuses(dataSource: DataSource): Promise<void> {
