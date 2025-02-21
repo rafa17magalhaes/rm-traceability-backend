@@ -32,6 +32,16 @@ export class StatusService {
     return status;
   }
 
+  async findByName(name: string, companyId?: string): Promise<Status> {
+    const status = await this.statusRepository.findOne({
+      where: { name, companyId },
+    });
+    if (!status) {
+      throw new NotFoundException(`Status "${name}" não encontrado.`);
+    }
+    return status;
+  }
+
   async update(id: string, updateStatusDto: UpdateStatusDTO): Promise<Status> {
     const status = await this.findOne(id);
     Object.assign(status, updateStatusDto);

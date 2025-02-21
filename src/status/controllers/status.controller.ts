@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, Query } from '@nestjs/common';
 import { StatusService } from '../services/status.service';
 import { CreateStatusDTO } from '../dtos/create-status.dto';
 import { UpdateStatusDTO } from '../dtos/update-status.dto';
@@ -21,6 +21,14 @@ export class StatusController {
   @Get('active')
   findActive(): Promise<Status[]> {
     return this.statusService.findActive();
+  }
+
+  @Get('by-name/:name')
+  findByName(
+    @Param('name') name: string,
+    @Query('companyId') companyId?: string,
+  ): Promise<Status> {
+    return this.statusService.findByName(name, companyId);
   }
 
   @Get(':id')
