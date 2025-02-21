@@ -28,7 +28,7 @@ import { CodeModule } from './codes/codes.module';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
         autoLoadEntities: true,
-        synchronize: true, // ⚠️ **Atenção:** Não usar `synchronize: true` em produção
+        synchronize: false, // ⚠️ **Atenção:** Não usar `synchronize: true` em produção
       }),
     }),
     CompaniesModule,

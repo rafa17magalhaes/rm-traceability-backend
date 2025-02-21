@@ -22,6 +22,6 @@ import { StatusRepository } from './repositories/status.repository';
       inject: [DataSource],
     },
   ],
-  exports: [StatusService],
+  exports: [StatusService, 'StatusRepository'],
 })
 export class StatusModule {}
