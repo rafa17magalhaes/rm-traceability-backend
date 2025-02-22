@@ -31,7 +31,7 @@ export class CodeService {
   }
 
   async findAll(): Promise<Code[]> {
-    return this.codeRepository.find({ relations: ['status', 'company', 'event', 'users'] });
+    return this.codeRepository.find({ relations: ['status', 'company', 'resource', 'user'] });
   }
   
   /**

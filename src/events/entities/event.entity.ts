@@ -30,7 +30,7 @@ import {
     @Column({ name: 'resource_id', nullable: true })
     resourceId: string;
 
-    @Column({ name: 'companyid', nullable: true })
+    @Column({ name: 'company_id', nullable: true })
     companyId: string;
 
     @Column({ name: 'user_id', nullable: true })
