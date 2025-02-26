@@ -30,7 +30,9 @@ describe('StatusController', () => {
     }).compile();
 
     controller = module.get<StatusController>(StatusController);
-    serviceMock = module.get<StatusService>(StatusService) as jest.Mocked<StatusService>;
+    serviceMock = module.get<StatusService>(
+      StatusService,
+    ) as jest.Mocked<StatusService>;
   });
 
   it('should be defined', () => {
@@ -44,7 +46,11 @@ describe('StatusController', () => {
       companyId: 'company-id-1',
       active: true,
     };
-    const status: Status = { id: 'uuid-1', ...dto, resource: undefined } as Status;
+    const status: Status = {
+      id: 'uuid-1',
+      ...dto,
+      resource: undefined,
+    } as Status;
 
     serviceMock.create.mockResolvedValue(status);
     const result = await controller.create(dto);
@@ -55,8 +61,22 @@ describe('StatusController', () => {
 
   it('findAll - deve chamar o service e retornar uma lista de status', async () => {
     const statuses: Status[] = [
-      { id: 'uuid-1', name: 'Status 1', description: 'Desc 1', companyId: 'comp1', active: true, resource: undefined } as Status,
-      { id: 'uuid-2', name: 'Status 2', description: 'Desc 2', companyId: 'comp2', active: false, resource: undefined } as Status,
+      {
+        id: 'uuid-1',
+        name: 'Status 1',
+        description: 'Desc 1',
+        companyId: 'comp1',
+        active: true,
+        resource: undefined,
+      } as Status,
+      {
+        id: 'uuid-2',
+        name: 'Status 2',
+        description: 'Desc 2',
+        companyId: 'comp2',
+        active: false,
+        resource: undefined,
+      } as Status,
     ];
 
     serviceMock.findAll.mockResolvedValue(statuses);
@@ -68,18 +88,32 @@ describe('StatusController', () => {
 
   it('findActive - deve chamar o service e retornar apenas status ativos', async () => {
     const statuses: Status[] = [
-      { id: 'uuid-1', name: 'Status 1', description: 'Desc 1', companyId: 'comp1', active: true, resource: undefined } as Status,
+      {
+        id: 'uuid-1',
+        name: 'Status 1',
+        description: 'Desc 1',
+        companyId: 'comp1',
+        active: true,
+        resource: undefined,
+      } as Status,
     ];
 
     serviceMock.findActive.mockResolvedValue(statuses);
     const result = await controller.findActive();
 
     expect(serviceMock.findActive).toHaveBeenCalled();
-    expect(result.every(s => s.active)).toBe(true);
+    expect(result.every((s) => s.active)).toBe(true);
   });
 
   it('findOne - deve chamar o service e retornar um status', async () => {
-    const status: Status = { id: 'uuid-1', name: 'Status 1', description: 'Desc 1', companyId: 'comp1', active: true, resource: undefined } as Status;
+    const status: Status = {
+      id: 'uuid-1',
+      name: 'Status 1',
+      description: 'Desc 1',
+      companyId: 'comp1',
+      active: true,
+      resource: undefined,
+    } as Status;
 
     serviceMock.findOne.mockResolvedValue(status);
     const result = await controller.findOne('uuid-1');
@@ -90,7 +124,14 @@ describe('StatusController', () => {
 
   it('update - deve chamar o service e retornar o status atualizado', async () => {
     const updateDto: UpdateStatusDTO = { name: 'Status Atualizado' };
-    const status: Status = { id: 'uuid-1', name: 'Status Atualizado', description: 'Desc 1', companyId: 'comp1', active: true, resource: undefined } as Status;
+    const status: Status = {
+      id: 'uuid-1',
+      name: 'Status Atualizado',
+      description: 'Desc 1',
+      companyId: 'comp1',
+      active: true,
+      resource: undefined,
+    } as Status;
 
     serviceMock.update.mockResolvedValue(status);
     const result = await controller.update('uuid-1', updateDto);

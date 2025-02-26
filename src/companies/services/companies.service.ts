@@ -28,7 +28,10 @@ export class CompaniesService {
     return company;
   }
 
-  async update(id: string, UpdateCompanyDTO: UpdateCompanyDTO): Promise<Company> {
+  async update(
+    id: string,
+    UpdateCompanyDTO: UpdateCompanyDTO,
+  ): Promise<Company> {
     const company = await this.findOne(id);
     Object.assign(company, UpdateCompanyDTO);
     return this.companyRepository.save(company);

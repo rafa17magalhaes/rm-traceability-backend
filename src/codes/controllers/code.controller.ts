@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Controller, Get, Post, Body, Patch, Param, Req } from '@nestjs/common';
 import { CodeService } from '../services/code.service';
 import { Code } from '../entities/code.entity';
@@ -37,4 +38,5 @@ export class CodeController {
       body.observation,
       userId,
     );
-  }}
+  }
+}

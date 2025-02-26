@@ -31,7 +31,9 @@ describe('StatusService', () => {
     }).compile();
 
     service = module.get<StatusService>(StatusService);
-    repoMock = module.get<StatusRepositoryType>('StatusRepository') as jest.Mocked<StatusRepositoryType>;
+    repoMock = module.get<StatusRepositoryType>(
+      'StatusRepository',
+    ) as jest.Mocked<StatusRepositoryType>;
   });
 
   it('should be defined', () => {
@@ -46,7 +48,11 @@ describe('StatusService', () => {
         companyId: 'comp1',
         active: true,
       };
-      const status: Status = { id: 'uuid-1', ...dto, resource: undefined } as Status;
+      const status: Status = {
+        id: 'uuid-1',
+        ...dto,
+        resource: undefined,
+      } as Status;
 
       repoMock.create.mockReturnValue(status);
       repoMock.save.mockResolvedValue(status);
@@ -61,8 +67,22 @@ describe('StatusService', () => {
   describe('findAll', () => {
     it('deve retornar todos os status', async () => {
       const statuses: Status[] = [
-        { id: 'uuid-1', name: 'Status 1', description: 'Desc 1', companyId: 'comp1', active: true, resource: undefined } as Status,
-        { id: 'uuid-2', name: 'Status 2', description: 'Desc 2', companyId: 'comp2', active: false, resource: undefined } as Status,
+        {
+          id: 'uuid-1',
+          name: 'Status 1',
+          description: 'Desc 1',
+          companyId: 'comp1',
+          active: true,
+          resource: undefined,
+        } as Status,
+        {
+          id: 'uuid-2',
+          name: 'Status 2',
+          description: 'Desc 2',
+          companyId: 'comp2',
+          active: false,
+          resource: undefined,
+        } as Status,
       ];
       repoMock.find.mockResolvedValue(statuses);
 
@@ -75,28 +95,46 @@ describe('StatusService', () => {
   describe('findActive', () => {
     it('deve retornar somente os status ativos', async () => {
       const statuses: Status[] = [
-        { id: 'uuid-1', name: 'Status 1', description: 'Desc 1', companyId: 'comp1', active: true, resource: undefined } as Status,
+        {
+          id: 'uuid-1',
+          name: 'Status 1',
+          description: 'Desc 1',
+          companyId: 'comp1',
+          active: true,
+          resource: undefined,
+        } as Status,
       ];
       repoMock.findActiveStatuses.mockResolvedValue(statuses);
 
       const result = await service.findActive();
       expect(repoMock.findActiveStatuses).toHaveBeenCalled();
-      expect(result.every(s => s.active)).toBe(true);
+      expect(result.every((s) => s.active)).toBe(true);
     });
   });
 
   describe('findOne', () => {
     it('deve lançar NotFoundException se o status não for encontrado', async () => {
       repoMock.findOne.mockResolvedValue(null);
-      await expect(service.findOne('invalid-id')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('invalid-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('deve retornar um status se encontrado', async () => {
-      const status: Status = { id: 'uuid-1', name: 'Status 1', description: 'Desc 1', companyId: 'comp1', active: true, resource: undefined } as Status;
+      const status: Status = {
+        id: 'uuid-1',
+        name: 'Status 1',
+        description: 'Desc 1',
+        companyId: 'comp1',
+        active: true,
+        resource: undefined,
+      } as Status;
       repoMock.findOne.mockResolvedValue(status);
 
       const result = await service.findOne('uuid-1');
-      expect(repoMock.findOne).toHaveBeenCalledWith({ where: { id: 'uuid-1' } });
+      expect(repoMock.findOne).toHaveBeenCalledWith({
+        where: { id: 'uuid-1' },
+      });
       expect(result.id).toBe('uuid-1');
     });
   });
@@ -104,14 +142,23 @@ describe('StatusService', () => {
   describe('update', () => {
     it('deve atualizar e retornar o status atualizado', async () => {
       const updateDto: UpdateStatusDTO = { name: 'Updated Name' };
-      const status: Status = { id: 'uuid-1', name: 'Old Name', description: 'Desc', companyId: 'comp1', active: true, resource: undefined } as Status;
+      const status: Status = {
+        id: 'uuid-1',
+        name: 'Old Name',
+        description: 'Desc',
+        companyId: 'comp1',
+        active: true,
+        resource: undefined,
+      } as Status;
       const updatedStatus: Status = { ...status, ...updateDto };
 
       repoMock.findOne.mockResolvedValue(status);
       repoMock.save.mockResolvedValue(updatedStatus);
 
       const result = await service.update('uuid-1', updateDto);
-      expect(repoMock.findOne).toHaveBeenCalledWith({ where: { id: 'uuid-1' } });
+      expect(repoMock.findOne).toHaveBeenCalledWith({
+        where: { id: 'uuid-1' },
+      });
       expect(repoMock.save).toHaveBeenCalledWith(status);
       expect(result.name).toBe('Updated Name');
     });
@@ -119,12 +166,21 @@ describe('StatusService', () => {
 
   describe('remove', () => {
     it('deve remover o status', async () => {
-      const status: Status = { id: 'uuid-1', name: 'Status 1', description: 'Desc 1', companyId: 'comp1', active: true, resource: undefined } as Status;
+      const status: Status = {
+        id: 'uuid-1',
+        name: 'Status 1',
+        description: 'Desc 1',
+        companyId: 'comp1',
+        active: true,
+        resource: undefined,
+      } as Status;
       repoMock.findOne.mockResolvedValue(status);
       repoMock.remove.mockResolvedValue(status);
 
       await service.remove('uuid-1');
-      expect(repoMock.findOne).toHaveBeenCalledWith({ where: { id: 'uuid-1' } });
+      expect(repoMock.findOne).toHaveBeenCalledWith({
+        where: { id: 'uuid-1' },
+      });
       expect(repoMock.remove).toHaveBeenCalledWith(status);
     });
   });

@@ -13,7 +13,10 @@ export class ActiveTokensController {
 
   @Patch()
   async activate(@Body() body: { code: string; password: string }) {
-    const user = await this.activeTokensService.activateUser(body.code, body.password);
+    const user = await this.activeTokensService.activateUser(
+      body.code,
+      body.password,
+    );
     return { message: 'User activated successfully', user };
   }
 }

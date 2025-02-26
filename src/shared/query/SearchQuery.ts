@@ -17,8 +17,9 @@ export default class SearchQuery {
 
   get search(): string {
     return this.params
-      .map(({ key, operator, value, isOrOpertator }) => 
-         `${key}${operator}${value}${isOrOpertator ? '||' : ','}`
+      .map(
+        ({ key, operator, value, isOrOpertator }) =>
+          `${key}${operator}${value}${isOrOpertator ? '||' : ','}`,
       )
       .join('')
       .replace(/,$/, '');
@@ -45,7 +46,9 @@ export default class SearchQuery {
 
   setSearch(search: string): this {
     this.params = []; // Limpa os parâmetros antigos
-    const searchMatches = `${search},`.matchAll(/(\|?)(\w+?)(:|!|>|<|~|-)(.+?)(,|\|)/gm);
+    const searchMatches = `${search},`.matchAll(
+      /(\|?)(\w+?)(:|!|>|<|~|-)(.+?)(,|\|)/gm,
+    );
     Array.from(searchMatches).forEach((match) => {
       this.with(match[2], match[3], match[4], match[1] === '|');
     });
@@ -74,7 +77,12 @@ export default class SearchQuery {
     return this.sortBy(key, 'DESC');
   }
 
-  with(key: string, operator: Operators, value: string, isOrOpertator: boolean = false): SearchQuery {
+  with(
+    key: string,
+    operator: Operators,
+    value: string,
+    isOrOpertator: boolean = false,
+  ): SearchQuery {
     this.params.push({ key, operator, value, isOrOpertator });
     return this;
   }

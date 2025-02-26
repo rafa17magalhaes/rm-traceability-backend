@@ -50,11 +50,14 @@ describe('ActiveTokensController', () => {
 
       // Chama o método do controller com um corpo de requisição simulado.
       const result = await controller.resend({ userId: 'user-id' });
-      
+
       // Verifica se o método do serviço foi chamado com o valor correto.
       expect(activeTokensService.resendToken).toHaveBeenCalledWith('user-id');
       // Verifica se o controller retorna o objeto com a mensagem e o token.code.
-      expect(result).toEqual({ message: 'Token resent', token: fakeToken.code });
+      expect(result).toEqual({
+        message: 'Token resent',
+        token: fakeToken.code,
+      });
     });
   });
 
@@ -62,27 +65,36 @@ describe('ActiveTokensController', () => {
     it('should call ActiveTokensService.activateUser and return the user', async () => {
       // Cria um objeto de User simulado.
       const fakeUser: UserDTO = {
-          id: 'user-id',
-          name: 'Test User',
-          email: 'test@example.com',
-          phone: '1234567890',
-          active: true,
-          passwordHash: 'hashed-password',
-          companyId: null,
-          company: undefined,
-          password: ''
+        id: 'user-id',
+        name: 'Test User',
+        email: 'test@example.com',
+        phone: '1234567890',
+        active: true,
+        passwordHash: 'hashed-password',
+        companyId: null,
+        company: undefined,
+        password: '',
       };
 
       // Define o comportamento do método activateUser do serviço.
       mockActiveTokensService.activateUser.mockResolvedValue(fakeUser);
 
       // Chama o método do controller com um corpo de requisição simulado.
-      const result = await controller.activate({ code: 'token-code', password: 'newpass' });
-      
+      const result = await controller.activate({
+        code: 'token-code',
+        password: 'newpass',
+      });
+
       // Verifica se o método do serviço foi chamado com os valores corretos.
-      expect(activeTokensService.activateUser).toHaveBeenCalledWith('token-code', 'newpass');
+      expect(activeTokensService.activateUser).toHaveBeenCalledWith(
+        'token-code',
+        'newpass',
+      );
       // Verifica se o controller retorna o objeto com a mensagem e o usuário.
-      expect(result).toEqual({ message: 'User activated successfully', user: fakeUser });
+      expect(result).toEqual({
+        message: 'User activated successfully',
+        user: fakeUser,
+      });
     });
   });
 });

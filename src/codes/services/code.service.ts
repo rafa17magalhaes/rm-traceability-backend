@@ -31,9 +31,11 @@ export class CodeService {
   }
 
   async findAll(): Promise<Code[]> {
-    return this.codeRepository.find({ relations: ['status', 'company', 'resource', 'user'] });
+    return this.codeRepository.find({
+      relations: ['status', 'company', 'resource', 'user'],
+    });
   }
-  
+
   /**
    * Altera o status de um código e registra um event correspondente.
    */
@@ -87,13 +89,16 @@ export class CodeService {
       const savedCode = await this.codeRepository.save(codeEntity);
 
       // Busca o status "Gerado" dinamicamente (pode filtrar também pelo companyId, se necessário)
-      const statusGerado = await this.statusService.findByName('Gerado', savedCode.companyId);
-      
+      const statusGerado = await this.statusService.findByName(
+        'Gerado',
+        savedCode.companyId,
+      );
+
       // Registra o evento "Gerado" e atualiza o status do código
       const updatedCode = await this.changeCodeStatus(
         savedCode.id,
         statusGerado.id,
-        'Código gerado por lote'
+        'Código gerado por lote',
       );
       generatedCodes.push(updatedCode);
     }

@@ -16,7 +16,10 @@ import { Resource } from '../entities/resource.entity';
 import { CreateResourceDTO } from '../dtos/create-resource.dto';
 import { UpdateResourceDTO } from '../dtos/update-resource.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ExpressUserRequest, UserPayload } from 'src/auth/types/ExpressUserRequest';
+import {
+  ExpressUserRequest,
+  UserPayload,
+} from 'src/auth/types/ExpressUserRequest';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AwsS3Service } from 'src/aws/aws-s3.service';
@@ -33,7 +36,11 @@ export class ResourcesController {
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: 'Criar um novo recurso com imagem' })
-  @ApiResponse({ status: 201, description: 'Recurso criado com sucesso.', type: Resource })
+  @ApiResponse({
+    status: 201,
+    description: 'Recurso criado com sucesso.',
+    type: Resource,
+  })
   async create(
     @Body() dto: CreateResourceDTO,
     @UploadedFile() file: Express.Multer.File,
@@ -50,21 +57,33 @@ export class ResourcesController {
 
   @Get()
   @ApiOperation({ summary: 'Listar todos os recursos' })
-  @ApiResponse({ status: 200, description: 'Lista de recursos.', type: [Resource] })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de recursos.',
+    type: [Resource],
+  })
   findAll(): Promise<Resource[]> {
     return this.resourcesService.findAll();
   }
 
   @Get('active')
   @ApiOperation({ summary: 'Listar recursos ativos' })
-  @ApiResponse({ status: 200, description: 'Lista de recursos ativos.', type: [Resource] })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de recursos ativos.',
+    type: [Resource],
+  })
   findActive(): Promise<Resource[]> {
     return this.resourcesService.findActive();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Obter um recurso por ID' })
-  @ApiResponse({ status: 200, description: 'Recurso encontrado.', type: Resource })
+  @ApiResponse({
+    status: 200,
+    description: 'Recurso encontrado.',
+    type: Resource,
+  })
   findOne(@Param('id') id: string): Promise<Resource> {
     return this.resourcesService.findOne(id);
   }
@@ -72,14 +91,18 @@ export class ResourcesController {
   @Put(':id')
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: 'Atualizar um recurso existente' })
-  @ApiResponse({ status: 200, description: 'Recurso atualizado com sucesso.', type: Resource })
+  @ApiResponse({
+    status: 200,
+    description: 'Recurso atualizado com sucesso.',
+    type: Resource,
+  })
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateResourceDTO,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Resource> {
     let imageUrl: string | undefined;
-  
+
     // Se o usuário anexar um novo arquivo, faz upload e atualiza a URL
     if (file) {
       imageUrl = await this.awsS3Service.uploadFile(file);

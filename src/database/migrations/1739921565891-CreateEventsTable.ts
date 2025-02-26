@@ -1,4 +1,9 @@
-import { MigrationInterface, QueryRunner, Table, TableForeignKey } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableForeignKey,
+} from 'typeorm';
 
 export class CreateEventsTable1739921565891 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -136,25 +141,25 @@ export class CreateEventsTable1739921565891 implements MigrationInterface {
   public async down(queryRunner: QueryRunner): Promise<void> {
     const table = await queryRunner.getTable('events');
     if (table) {
-      const userForeignKey = table.foreignKeys.find(fk =>
+      const userForeignKey = table.foreignKeys.find((fk) =>
         fk.columnNames.includes('user_id'),
       );
       if (userForeignKey) {
         await queryRunner.dropForeignKey('events', userForeignKey);
       }
-      const companyForeignKey = table.foreignKeys.find(fk =>
+      const companyForeignKey = table.foreignKeys.find((fk) =>
         fk.columnNames.includes('company_id'),
       );
       if (companyForeignKey) {
         await queryRunner.dropForeignKey('events', companyForeignKey);
       }
-      const resourceForeignKey = table.foreignKeys.find(fk =>
+      const resourceForeignKey = table.foreignKeys.find((fk) =>
         fk.columnNames.includes('resource_id'),
       );
       if (resourceForeignKey) {
         await queryRunner.dropForeignKey('events', resourceForeignKey);
       }
-      const statusForeignKey = table.foreignKeys.find(fk =>
+      const statusForeignKey = table.foreignKeys.find((fk) =>
         fk.columnNames.includes('status_id'),
       );
       if (statusForeignKey) {

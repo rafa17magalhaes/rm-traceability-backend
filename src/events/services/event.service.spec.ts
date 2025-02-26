@@ -28,7 +28,9 @@ describe('EventService', () => {
     }).compile();
 
     service = module.get<EventService>(EventService);
-    repoMock = module.get<EventRepositoryType>('EventRepository') as jest.Mocked<EventRepositoryType>;
+    repoMock = module.get<EventRepositoryType>(
+      'EventRepository',
+    ) as jest.Mocked<EventRepositoryType>;
   });
 
   it('should be defined', () => {

@@ -27,7 +27,9 @@ describe('EventController', () => {
     }).compile();
 
     controller = module.get<EventController>(EventController);
-    serviceMock = module.get<EventService>(EventService) as jest.Mocked<EventService>;
+    serviceMock = module.get<EventService>(
+      EventService,
+    ) as jest.Mocked<EventService>;
   });
 
   it('should be defined', () => {

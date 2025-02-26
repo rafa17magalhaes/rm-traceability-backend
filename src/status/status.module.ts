@@ -8,9 +8,7 @@ import { StatusController } from './controllers/status.controller';
 import { StatusRepository } from './repositories/status.repository';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Status]),
-  ],
+  imports: [TypeOrmModule.forFeature([Status])],
   controllers: [StatusController],
   providers: [
     StatusService,

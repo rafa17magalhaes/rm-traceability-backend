@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, Req, UseGuards } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  Delete,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDTO } from '../dtos/create-user.dto';
 import { UpdateUserDTO } from '../dtos/update-user.dto';
@@ -11,7 +22,10 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() createUserDTO: CreateUserDTO, @Req() request): Promise<User> {
+  async create(
+    @Body() createUserDTO: CreateUserDTO,
+    @Req() request,
+  ): Promise<User> {
     const companyId = request.user.companyId;
     return await this.usersService.create(createUserDTO, companyId);
   }
@@ -27,7 +41,10 @@ export class UsersController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateUserDTO: UpdateUserDTO): Promise<User> {
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDTO: UpdateUserDTO,
+  ): Promise<User> {
     return this.usersService.update(id, updateUserDTO);
   }
 

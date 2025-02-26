@@ -27,7 +27,9 @@ describe('UsersController', () => {
     }).compile();
 
     controller = module.get<UsersController>(UsersController);
-    serviceMock = module.get<UsersService>(UsersService) as jest.Mocked<UsersService>;
+    serviceMock = module.get<UsersService>(
+      UsersService,
+    ) as jest.Mocked<UsersService>;
   });
 
   it('should be defined', () => {

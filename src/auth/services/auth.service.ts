@@ -11,18 +11,18 @@ export class AuthService {
   ) {}
 
   // Método chamado pela LocalStrategy
-async validateUser(email: string, password: string): Promise<any> {
-  const user = await this.usersService.findByEmail(email);
-  if (user && await user.checkPassword(password)) {
-    return user;
+  async validateUser(email: string, password: string): Promise<any> {
+    const user = await this.usersService.findByEmail(email);
+    if (user && (await user.checkPassword(password))) {
+      return user;
+    }
+    return null;
   }
-  return null;
-}
 
-async login(user: User) {
-  const payload = { sub: user.id, companyId: user.companyId };
-  return {
-    accessToken: this.jwtService.sign(payload),
-  };
- }
+  async login(user: User) {
+    const payload = { sub: user.id, companyId: user.companyId };
+    return {
+      accessToken: this.jwtService.sign(payload),
+    };
+  }
 }

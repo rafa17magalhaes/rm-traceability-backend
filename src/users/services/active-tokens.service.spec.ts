@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
 import { ActiveTokensService } from './active-tokens.service';
 import { UsersService } from './users.service';
@@ -32,8 +33,12 @@ describe('ActiveTokensService', () => {
     }).compile();
 
     service = module.get<ActiveTokensService>(ActiveTokensService);
-    repoMock = module.get<ActiveTokenRepositoryType>('ActiveTokenRepository') as jest.Mocked<ActiveTokenRepositoryType>;
-    usersServiceMock = module.get<UsersService>(UsersService) as jest.Mocked<UsersService>;
+    repoMock = module.get<ActiveTokenRepositoryType>(
+      'ActiveTokenRepository',
+    ) as jest.Mocked<ActiveTokenRepositoryType>;
+    usersServiceMock = module.get<UsersService>(
+      UsersService,
+    ) as jest.Mocked<UsersService>;
   });
 
   it('should be defined', () => {
@@ -43,7 +48,9 @@ describe('ActiveTokensService', () => {
   describe('resendToken', () => {
     it('deve lançar erro se usuário não encontrado ou inativo', async () => {
       usersServiceMock.findOne.mockResolvedValueOnce(null as any);
-      await expect(service.resendToken('invalid-user')).rejects.toThrow(BadRequestException);
+      await expect(service.resendToken('invalid-user')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 });

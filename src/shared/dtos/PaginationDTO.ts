@@ -1,7 +1,6 @@
 export default interface PaginationDTO<T> {
-    data: T[];
-    page: number;
-    size: number;
-    total: number;
-  }
-  
+  data: T[];
+  page: number;
+  size: number;
+  total: number;
+}

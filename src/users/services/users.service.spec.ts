@@ -29,7 +29,9 @@ describe('UsersService', () => {
     }).compile();
 
     service = module.get<UsersService>(UsersService);
-    repoMock = module.get<UserRepositoryType>('UserRepository') as jest.Mocked<UserRepositoryType>;
+    repoMock = module.get<UserRepositoryType>(
+      'UserRepository',
+    ) as jest.Mocked<UserRepositoryType>;
   });
 
   it('should be defined', () => {
@@ -38,10 +40,17 @@ describe('UsersService', () => {
 
   describe('create', () => {
     it('deve lançar ConflictException se o e-mail já existir', async () => {
-      repoMock.findOne.mockResolvedValue({ id: 'uuid-1', email: 'teste@teste.com' } as User);
+      repoMock.findOne.mockResolvedValue({
+        id: 'uuid-1',
+        email: 'teste@teste.com',
+      } as User);
 
       await expect(
-        service.create({ name: 'Teste', email: 'teste@teste.com', password: '123' }),
+        service.create({
+          name: 'Teste',
+          email: 'teste@teste.com',
+          password: '123',
+        }),
       ).rejects.toThrow(ConflictException);
     });
 
@@ -50,7 +59,11 @@ describe('UsersService', () => {
       repoMock.create.mockReturnValue({ id: 'uuid-2' } as User);
       repoMock.save.mockResolvedValue({ id: 'uuid-2' } as User);
 
-      const result = await service.create({ name: 'Novo', email: 'novo@teste.com', password: '123' });
+      const result = await service.create({
+        name: 'Novo',
+        email: 'novo@teste.com',
+        password: '123',
+      });
       expect(repoMock.findOne).toHaveBeenCalled();
       expect(repoMock.create).toHaveBeenCalled();
       expect(repoMock.save).toHaveBeenCalled();
@@ -61,7 +74,9 @@ describe('UsersService', () => {
   describe('findOne', () => {
     it('deve lançar NotFoundException se não encontrar', async () => {
       repoMock.findOne.mockResolvedValue(null);
-      await expect(service.findOne('invalido')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('invalido')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

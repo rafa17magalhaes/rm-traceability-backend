@@ -13,7 +13,9 @@ export async function seed(): Promise<void> {
     const companyRepo = dataSource.getRepository(Company);
     const userRepo = dataSource.getRepository(User);
 
-    let existingCompany = await companyRepo.findOne({ where: { name: 'Smart Invisible' } });
+    let existingCompany = await companyRepo.findOne({
+      where: { name: 'Smart Invisible' },
+    });
     if (!existingCompany) {
       existingCompany = companyRepo.create({
         code: 'SMART123',
@@ -27,7 +29,9 @@ export async function seed(): Promise<void> {
       console.log('Empresa "Smart Invisible" já existe.');
     }
 
-    const existingUser = await userRepo.findOne({ where: { email: 'admin@padrao.com' } });
+    const existingUser = await userRepo.findOne({
+      where: { email: 'admin@padrao.com' },
+    });
     if (!existingUser) {
       const newUser = userRepo.create({
         name: 'Rafael',

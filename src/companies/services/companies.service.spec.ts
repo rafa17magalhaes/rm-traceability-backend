@@ -29,7 +29,9 @@ describe('CompaniesService', () => {
     }).compile();
 
     service = module.get<CompaniesService>(CompaniesService);
-    repositoryMock = module.get<CompanyRepositoryType>('CompanyRepository') as jest.Mocked<CompanyRepositoryType>;
+    repositoryMock = module.get<CompanyRepositoryType>(
+      'CompanyRepository',
+    ) as jest.Mocked<CompanyRepositoryType>;
   });
 
   it('should be defined', () => {
@@ -66,7 +68,9 @@ describe('CompaniesService', () => {
     it('deve disparar NotFoundException se não encontrar', async () => {
       repositoryMock.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('invalido')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('invalido')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

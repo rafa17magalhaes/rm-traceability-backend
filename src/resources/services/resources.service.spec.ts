@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { Resource } from '../entities/resource.entity';
@@ -29,7 +30,9 @@ describe('ResourcesService', () => {
     }).compile();
 
     service = module.get<ResourcesService>(ResourcesService);
-    repositoryMock = module.get<ResourceRepositoryType>('ResourceRepository') as jest.Mocked<ResourceRepositoryType>;
+    repositoryMock = module.get<ResourceRepositoryType>(
+      'ResourceRepository',
+    ) as jest.Mocked<ResourceRepositoryType>;
   });
 
   it('should be defined', () => {
@@ -66,7 +69,9 @@ describe('ResourcesService', () => {
     it('deve disparar NotFoundException se não encontrar', async () => {
       repositoryMock.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('invalido')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('invalido')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -80,7 +85,9 @@ describe('ResourcesService', () => {
     it('deve disparar NotFoundException se não encontrar', async () => {
       repositoryMock.delete.mockResolvedValue({ affected: 0 } as any);
 
-      await expect(service.remove('invalido')).rejects.toThrow(NotFoundException);
+      await expect(service.remove('invalido')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

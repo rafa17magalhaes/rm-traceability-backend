@@ -11,8 +11,12 @@ export class AwsS3Service {
   private bucketName: string;
 
   constructor() {
-    if (!process.env.AWS_BUCKET_NAME || !process.env.AWS_REGION || 
-        !process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
+    if (
+      !process.env.AWS_BUCKET_NAME ||
+      !process.env.AWS_REGION ||
+      !process.env.AWS_ACCESS_KEY_ID ||
+      !process.env.AWS_SECRET_ACCESS_KEY
+    ) {
       throw new Error('Faltam variáveis de ambiente para AWS S3.');
     }
 

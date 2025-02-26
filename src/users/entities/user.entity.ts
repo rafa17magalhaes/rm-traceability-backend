@@ -11,7 +11,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { Exclude } from 'class-transformer';
-import authConfig from 'src/config/auth'; 
+import authConfig from 'src/config/auth';
 import { Company } from 'src/companies/entities/company.entity';
 import { ActiveToken } from './active-token.entity';
 
@@ -39,7 +39,7 @@ export class User {
   @Column({ name: 'password_hash', nullable: true })
   passwordHash: string;
 
-  @OneToMany(() => ActiveToken, activeToken => activeToken.user, {
+  @OneToMany(() => ActiveToken, (activeToken) => activeToken.user, {
     cascade: true,
     nullable: true,
   })
@@ -48,7 +48,7 @@ export class User {
   @Column({ name: 'company_id', nullable: true })
   companyId?: string;
 
-  @ManyToOne(() => Company, company => company.users, { eager: false })
+  @ManyToOne(() => Company, (company) => company.users, { eager: false })
   @JoinColumn({ name: 'company_id' })
   company?: Company;
 

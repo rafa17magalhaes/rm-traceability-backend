@@ -12,7 +12,10 @@ export class Resource {
   @Column()
   name: string;
 
-  @ApiProperty({ example: 'Descrição do recurso', description: 'Descrição do recurso' })
+  @ApiProperty({
+    example: 'Descrição do recurso',
+    description: 'Descrição do recurso',
+  })
   @Column()
   description: string;
 
@@ -24,7 +27,10 @@ export class Resource {
   @Column({ name: 'company_id' })
   companyId: string;
 
-  @ApiProperty({ example: 'https://s3.amazonaws.com/bucket/imagename.jpg', description: 'URL da imagem do recurso' })
+  @ApiProperty({
+    example: 'https://s3.amazonaws.com/bucket/imagename.jpg',
+    description: 'URL da imagem do recurso',
+  })
   @Column({ name: 'image_url', nullable: true })
   imageUrl?: string;
 }

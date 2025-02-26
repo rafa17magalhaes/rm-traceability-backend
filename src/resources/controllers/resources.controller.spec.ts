@@ -28,7 +28,9 @@ describe('ResourcesController', () => {
     }).compile();
 
     controller = module.get<ResourcesController>(ResourcesController);
-    serviceMock = module.get<ResourcesService>(ResourcesService) as jest.Mocked<ResourcesService>;
+    serviceMock = module.get<ResourcesService>(
+      ResourcesService,
+    ) as jest.Mocked<ResourcesService>;
   });
 
   it('should be defined', () => {
@@ -37,7 +39,11 @@ describe('ResourcesController', () => {
 
   describe('create', () => {
     it('deve chamar o service.create com DTO e retornar o recurso criado', async () => {
-      const dto = { name: 'Resource Teste', description: 'Desc', companyId: 'company-123' };
+      const dto = {
+        name: 'Resource Teste',
+        description: 'Desc',
+        companyId: 'company-123',
+      };
       const resourceMock = { id: 'uuid-1', ...dto } as Resource;
 
       serviceMock.create.mockResolvedValue(resourceMock);

@@ -22,7 +22,7 @@ import { ActiveToken } from './entities/active-token.entity';
       provide: 'UserRepository',
       useFactory: (dataSource: DataSource) =>
         dataSource.getRepository(User).extend({
-          async findActive(this: any) {
+          async findActive() {
             return this.find({ where: { active: true } });
           },
         }),
@@ -41,7 +41,11 @@ import { ActiveToken } from './entities/active-token.entity';
           },
           async findValidToken(code: string): Promise<ActiveToken | null> {
             const token = await this.findOne({
-              where: { code, used: false, expires: MoreThanOrEqual(new Date()) },
+              where: {
+                code,
+                used: false,
+                expires: MoreThanOrEqual(new Date()),
+              },
               relations: ['user'],
             });
             return token ?? null;

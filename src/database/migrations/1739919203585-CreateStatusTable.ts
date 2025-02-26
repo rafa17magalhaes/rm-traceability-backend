@@ -1,4 +1,9 @@
-import { MigrationInterface, QueryRunner, Table, TableForeignKey } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableForeignKey,
+} from 'typeorm';
 
 export class CreateStatusTable1739919203585 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -89,17 +94,17 @@ export class CreateStatusTable1739919203585 implements MigrationInterface {
       }),
     );
 
-        // Cria FK para company_id (referenciando users)
-        await queryRunner.createForeignKey(
-          'status',
-          new TableForeignKey({
-            columnNames: ['company_id'],
-            referencedTableName: 'companies',
-            referencedColumnNames: ['id'],
-            onDelete: 'SET NULL',
-            onUpdate: 'CASCADE',
-          }),
-        );
+    // Cria FK para company_id (referenciando users)
+    await queryRunner.createForeignKey(
+      'status',
+      new TableForeignKey({
+        columnNames: ['company_id'],
+        referencedTableName: 'companies',
+        referencedColumnNames: ['id'],
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      }),
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

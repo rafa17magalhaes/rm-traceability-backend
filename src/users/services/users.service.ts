@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, ConflictException, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  Inject,
+} from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { CreateUserDTO } from '../dtos/create-user.dto';
 import { UpdateUserDTO } from '../dtos/update-user.dto';
@@ -13,17 +18,23 @@ export class UsersService {
 
   async create(createUserDTO: CreateUserDTO, companyId: string): Promise<User> {
     const { email, name, phone, password, active } = createUserDTO;
-    
+
     // Verifica se já existe um usuário com o mesmo e-mail
-    const existingByEmail = await this.userRepository.findOne({ where: { email } });
+    const existingByEmail = await this.userRepository.findOne({
+      where: { email },
+    });
     if (existingByEmail) {
       throw new ConflictException(`E-mail ${email} já cadastrado.`);
     }
 
     // Verifica se já existe um usuário com o mesmo nome dentro da mesma empresa
-    const existingByName = await this.userRepository.findOne({ where: { name, companyId } });
+    const existingByName = await this.userRepository.findOne({
+      where: { name, companyId },
+    });
     if (existingByName) {
-      throw new ConflictException(`Nome ${name} já cadastrado para esta empresa.`);
+      throw new ConflictException(
+        `Nome ${name} já cadastrado para esta empresa.`,
+      );
     }
     const user = this.userRepository.create({
       name,

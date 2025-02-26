@@ -2,17 +2,19 @@ import PaginationDTO from '../dtos/PaginationDTO';
 import GenericQueryList, { QueryParams } from './GenericQueryList';
 import SearchQuery from './SearchQuery';
 
-type Dummy = { id: number; name: string; };
+type Dummy = { id: number; name: string };
 
 const mockRepository = {
-  findAll: jest.fn((searchQuery: SearchQuery): Promise<PaginationDTO<Dummy>> => {
-    return Promise.resolve({
-      data: [{ id: 1, name: 'Test' }],
-      page: searchQuery.page,
-      size: searchQuery.size,
-      total: 1,
-    });
-  }),
+  findAll: jest.fn(
+    (searchQuery: SearchQuery): Promise<PaginationDTO<Dummy>> => {
+      return Promise.resolve({
+        data: [{ id: 1, name: 'Test' }],
+        page: searchQuery.page,
+        size: searchQuery.size,
+        total: 1,
+      });
+    },
+  ),
 };
 
 describe('GenericQueryList', () => {
@@ -24,10 +26,10 @@ describe('GenericQueryList', () => {
 
   it('should call repository.findAll with the correct SearchQuery when list is invoked', async () => {
     const params: QueryParams = {
-      page: "2",
-      search: "name:Test",
-      sort: "name:ASC",
-      filters: { extra: "value" },
+      page: '2',
+      search: 'name:Test',
+      sort: 'name:ASC',
+      filters: { extra: 'value' },
     };
 
     const result = await genericQueryList.list(params);
