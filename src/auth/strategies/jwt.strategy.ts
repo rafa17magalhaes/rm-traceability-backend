@@ -14,10 +14,21 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
+    if (!payload.companyId) {
+      throw new UnauthorizedException(
+        'Token inválido: companyId não encontrado',
+      );
+    }
+
     const user = await this.usersService.findOne(payload.sub);
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
-    return { ...user, companyId: payload.companyId };
+
+    return {
+      id: user.id,
+      companyId: payload.companyId,
+      email: user.email,
+    };
   }
 }

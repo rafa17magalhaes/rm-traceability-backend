@@ -1,6 +1,7 @@
 import { Request } from 'express';
 
 export interface UserPayload {
+  id: string;
   companyId: string;
 }
 

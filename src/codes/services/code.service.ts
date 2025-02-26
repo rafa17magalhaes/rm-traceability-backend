@@ -44,13 +44,26 @@ export class CodeService {
     newStatusId: string,
     observation?: string,
     userId?: string,
+    resourceId?: string,
+    companyId?: string,
   ): Promise<Code> {
     const code = await this.codeRepository.findOne({ where: { id: codeId } });
     if (!code) {
       throw new NotFoundException(`Código não encontrado: ${codeId}`);
     }
 
-    // Verifica se o status existe
+    const sanitizedCompanyId =
+      companyId && companyId.trim() !== '' ? companyId : undefined;
+    const sanitizedResourceId =
+      resourceId && resourceId.trim() !== '' ? resourceId : undefined;
+
+    if (sanitizedCompanyId) {
+      code.companyId = sanitizedCompanyId;
+    }
+    if (sanitizedResourceId) {
+      code.resourceId = sanitizedResourceId;
+    }
+
     const status = await this.statusService.findOne(newStatusId);
     if (!status) {
       throw new NotFoundException(`Status não encontrado: ${newStatusId}`);
@@ -60,23 +73,23 @@ export class CodeService {
       codeId: code.id,
       valueCode: code.value,
       statusId: newStatusId,
-      observation: observation ?? undefined,
-      userId: userId ?? undefined,
-      companyId: code.companyId,
+      observation: observation || undefined,
+      userId: userId && userId.trim() !== '' ? userId : undefined,
+      companyId: sanitizedCompanyId || code.companyId,
+      resourceId: sanitizedResourceId,
     };
 
     const event = this.eventRepository.create(createEventDto);
     await this.eventRepository.save(event);
 
     code.statusId = newStatusId;
-    code.currentObservation = observation ?? '';
+    code.currentObservation = observation || '';
 
     return this.codeRepository.save(code);
   }
 
   /**
-   * Gera códigos em lote e, para cada código gerado,
-   * busca dinamicamente o status "Gerado" e registra o evento correspondente.
+   * Gera códigos em lote e registra um evento "Gerado" para cada código.
    */
   async bulkGenerateCodes(dto: BulkGenerateCodesDTO): Promise<Code[]> {
     const { quantity, prefix } = dto;
