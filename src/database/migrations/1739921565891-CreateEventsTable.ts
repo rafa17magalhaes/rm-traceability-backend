@@ -27,7 +27,7 @@ export class CreateEventsTable1739921565891 implements MigrationInterface {
           {
             name: 'valueCode',
             type: 'varchar',
-            isUnique: true,
+            isNullable: false,
           },
           {
             name: 'status_id',

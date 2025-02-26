@@ -37,7 +37,7 @@ export class CodeService {
   }
 
   /**
-   * Altera o status de um código e registra um event correspondente.
+   * Altera o status de um código e registra um evento correspondente.
    */
   async changeCodeStatus(
     codeId: string,
@@ -48,6 +48,12 @@ export class CodeService {
     const code = await this.codeRepository.findOne({ where: { id: codeId } });
     if (!code) {
       throw new NotFoundException(`Código não encontrado: ${codeId}`);
+    }
+
+    // Verifica se o status existe
+    const status = await this.statusService.findOne(newStatusId);
+    if (!status) {
+      throw new NotFoundException(`Status não encontrado: ${newStatusId}`);
     }
 
     const createEventDto: CreateEventDTO = {

@@ -31,7 +31,7 @@ export class CodeController {
     @Body() body: { statusId: string; observation?: string },
     @Req() req: Request,
   ): Promise<Code> {
-    const userId = (req.user as any)?.id || 'usuário-simulacao';
+    const userId = (req.user as any)?.id || undefined;
     return this.codeService.changeCodeStatus(
       codeId,
       body.statusId,
