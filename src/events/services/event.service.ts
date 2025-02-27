@@ -17,7 +17,9 @@ export class EventService {
   }
 
   async findAll(): Promise<Event[]> {
-    return this.eventRepository.find();
+    return this.eventRepository.find({
+      relations: ['status', 'company', 'resource', 'user', 'code'],
+    });
   }
 
   async findByCodeId(codeId: string): Promise<Event[]> {
