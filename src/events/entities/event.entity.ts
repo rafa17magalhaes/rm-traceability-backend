@@ -1,3 +1,4 @@
+import { Code } from 'src/codes/entities/code.entity';
 import { Company } from 'src/companies/entities/company.entity';
 import { Resource } from 'src/resources/entities/resource.entity';
 import { Status } from 'src/status/entities/status.entity';
@@ -8,6 +9,8 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity({ name: 'events' })
@@ -48,6 +51,10 @@ export class Event {
   @Column({ type: 'double precision', nullable: true })
   latitude: number;
 
+  @ManyToOne(() => Code, { nullable: true })
+  @JoinColumn({ name: 'code_id' })
+  code?: Code;
+
   @ManyToOne(() => Status, { nullable: true })
   @JoinColumn({ name: 'status_id' })
   status?: Status;
@@ -63,4 +70,10 @@ export class Event {
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'user_id' })
   user?: User;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 }

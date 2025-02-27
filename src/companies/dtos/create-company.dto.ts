@@ -13,4 +13,6 @@ export class CreateCompanyDTO {
   neighborhood?: string;
   city?: string;
   state?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }

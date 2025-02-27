@@ -4,6 +4,8 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Resource } from '../../resources/entities/resource.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -43,4 +45,10 @@ export class Status {
   @ManyToOne(() => Company, { nullable: true })
   @JoinColumn({ name: 'company_id' })
   company?: Company;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 }

@@ -11,4 +11,6 @@ export class CreateCodeDTO {
   driverName?: string | undefined;
   accessKey?: string | undefined;
   qrCodeUrl?: string | undefined;
+  createdAt?: string;
+  updatedAt?: string;
 }

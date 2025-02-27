@@ -10,4 +10,6 @@ export class UserDTO {
   password: string;
   companyId?: string | null;
   company?: CreateCompanyDTO;
+  createdAt?: string;
+  updatedAt?: string;
 }

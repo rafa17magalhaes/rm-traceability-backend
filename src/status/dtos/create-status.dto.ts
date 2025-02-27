@@ -4,4 +4,6 @@ export class CreateStatusDTO {
   active?: boolean;
   companyId: string;
   resourceId?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }

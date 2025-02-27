@@ -10,4 +10,6 @@ export class CreateEventDTO {
   longitude?: number;
   latitude?: number;
   userId?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
