@@ -7,6 +7,7 @@ export type QueryParams = {
   page?: string;
   search?: string;
   sort?: string;
+  size?: string;
   filters?: Record<string, any>;
 };
 

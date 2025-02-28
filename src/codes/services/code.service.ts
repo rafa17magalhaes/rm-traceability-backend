@@ -8,6 +8,8 @@ import * as crypto from 'crypto';
 import { EventRepositoryType } from 'src/events/interfaces/event-repository.type';
 import { StatusService } from 'src/status/services/status.service';
 import { CreateEventDTO } from 'src/events/dtos/create-event.dto';
+import PaginationDTO from 'src/shared/dtos/PaginationDTO';
+import SearchQuery from 'src/shared/query/SearchQuery';
 
 @Injectable()
 export class CodeService {
@@ -30,10 +32,54 @@ export class CodeService {
     return this.codeRepository.save(code);
   }
 
-  async findAll(): Promise<Code[]> {
-    return this.codeRepository.find({
-      relations: ['status', 'company', 'resource', 'user'],
+  async findAll(
+    queryParams: Partial<{
+      page: number;
+      search: string;
+      sort: string;
+      size: number;
+    }>,
+  ): Promise<PaginationDTO<Code>> {
+    const searchQuery = SearchQuery.build().from(queryParams);
+    const qb = this.codeRepository
+      .createQueryBuilder('code')
+      .leftJoinAndSelect('code.status', 'status')
+      .leftJoinAndSelect('code.company', 'company')
+      .leftJoinAndSelect('code.resource', 'resource')
+      .leftJoinAndSelect('code.user', 'user');
+
+    // Aplica filtros dinâmicos (exemplo simples para o operador "=")
+    searchQuery.params.forEach((criteria, index) => {
+      const paramName = `param${index}`;
+      if (criteria.operator === ':') {
+        qb.andWhere(`code.${criteria.key} = :${paramName}`, {
+          [paramName]: criteria.value,
+        });
+      } else if (criteria.operator === '>') {
+        qb.andWhere(`code.${criteria.key} > :${paramName}`, {
+          [paramName]: criteria.value,
+        });
+      } else if (criteria.operator === '<') {
+        qb.andWhere(`code.${criteria.key} < :${paramName}`, {
+          [paramName]: criteria.value,
+        });
+      }
     });
+
+    if (searchQuery.sort.length > 0) {
+      searchQuery.sort.forEach((sortStr) => {
+        const [key, order] = sortStr.split(':');
+        qb.addOrderBy(`code.${key}`, order as 'ASC' | 'DESC');
+      });
+    } else {
+      qb.addOrderBy('code.createdAt', 'DESC');
+    }
+
+    // Paginação
+    qb.skip((searchQuery.page - 1) * searchQuery.size).take(searchQuery.size);
+
+    const [data, total] = await qb.getManyAndCount();
+    return { data, total, page: searchQuery.page, size: searchQuery.size };
   }
 
   /**

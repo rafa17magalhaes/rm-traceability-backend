@@ -7,6 +7,7 @@ import {
   Param,
   Req,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CodeService } from '../services/code.service';
@@ -15,6 +16,8 @@ import { CreateCodeDTO } from '../dtos/create-code.dto';
 import { BulkGenerateCodesDTO } from '../dtos/bulk-generate-codes.dto';
 import { Request } from 'express';
 import { UserPayload } from 'src/auth/types/ExpressUserRequest';
+import PaginationDTO from 'src/shared/dtos/PaginationDTO';
+import { QueryParams } from 'src/shared/query/GenericQueryList';
 
 @Controller('codes')
 @UseGuards(AuthGuard('jwt'))
@@ -27,10 +30,20 @@ export class CodeController {
   }
 
   @Get()
-  findAll(): Promise<Code[]> {
-    return this.codeService.findAll();
+  async findAll(@Query() query: QueryParams): Promise<PaginationDTO<Code>> {
+    const convertedQuery: Partial<{
+      page: number;
+      search: string;
+      sort: string;
+      size: number;
+    }> = {
+      page: query.page ? Number(query.page) : 1,
+      search: query.search || '',
+      sort: query.sort || '',
+      size: query.size ? Number(query.size) : 20,
+    };
+    return this.codeService.findAll(convertedQuery);
   }
-
   @Post('bulk-generate')
   bulkGenerate(
     @Body() dto: BulkGenerateCodesDTO,
