@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { Status } from '../entities/status.entity';
 import { CreateStatusDTO } from '../dtos/create-status.dto';
 import { UpdateStatusDTO } from '../dtos/update-status.dto';
@@ -12,6 +17,21 @@ export class StatusService {
   ) {}
 
   async create(createStatusDto: CreateStatusDTO): Promise<Status> {
+    if (!createStatusDto.companyId || createStatusDto.companyId.trim() === '') {
+      throw new ConflictException('companyId é obrigatório');
+    }
+    // Verifica duplicidade para a mesma empresa
+    const existing = await this.statusRepository.findOne({
+      where: {
+        name: createStatusDto.name,
+        companyId: createStatusDto.companyId,
+      },
+    });
+    if (existing) {
+      throw new ConflictException(
+        `Status "${createStatusDto.name}" já existe para essa empresa.`,
+      );
+    }
     const status = this.statusRepository.create(createStatusDto);
     return this.statusRepository.save(status);
   }

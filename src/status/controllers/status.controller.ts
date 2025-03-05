@@ -7,19 +7,35 @@ import {
   Patch,
   Delete,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { StatusService } from '../services/status.service';
 import { CreateStatusDTO } from '../dtos/create-status.dto';
 import { UpdateStatusDTO } from '../dtos/update-status.dto';
 import { Status } from '../entities/status.entity';
+import { Request } from 'express';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { UserPayload } from 'src/auth/types/ExpressUserRequest';
 
 @Controller('status')
+@UseGuards(JwtAuthGuard)
 export class StatusController {
   constructor(private readonly statusService: StatusService) {}
 
   @Post()
-  create(@Body() createStatusDto: CreateStatusDTO): Promise<Status> {
-    return this.statusService.create(createStatusDto);
+  create(
+    @Body() createStatusDto: CreateStatusDTO,
+    @Req() req: Request,
+  ): Promise<Status> {
+    const user = req.user as UserPayload;
+    if (!user.companyId) {
+      throw new Error('ERRO: Usuário não possui companyId');
+    }
+    return this.statusService.create({
+      ...createStatusDto,
+      companyId: user.companyId,
+    });
   }
 
   @Get()
