@@ -34,7 +34,8 @@ export class EventService {
       .leftJoinAndSelect('event.company', 'company')
       .leftJoinAndSelect('event.resource', 'resource')
       .leftJoinAndSelect('event.user', 'user')
-      .leftJoinAndSelect('event.code', 'code');
+      .leftJoinAndSelect('event.code', 'code')
+      .leftJoinAndSelect('code.resource', 'codeResource');
 
     // Aplica os filtros dinâmicos baseados nos parâmetros de SearchQuery
     searchQuery.params.forEach((criteria, index) => {
@@ -62,10 +63,18 @@ export class EventService {
     } else {
       qb.addOrderBy('event.createdAt', 'DESC');
     }
+
     // Aplica paginação
     qb.skip((searchQuery.page - 1) * searchQuery.size).take(searchQuery.size);
 
     const [data, total] = await qb.getManyAndCount();
+
+    data.forEach((event) => {
+      if (event.code?.resourceId) {
+        event.resourceId = event.code.resourceId;
+      }
+    });
+
     return {
       data,
       total,
