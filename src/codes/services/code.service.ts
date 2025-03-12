@@ -32,6 +32,69 @@ export class CodeService {
     return this.codeRepository.save(code);
   }
 
+  async findInventoryCodes(
+    companyId: string,
+    queryParams: Partial<{
+      page: number;
+      search: string;
+      sort: string;
+      size: number;
+    }>,
+  ): Promise<PaginationDTO<Code>> {
+    const searchQuery = SearchQuery.build().from(queryParams);
+
+    const qb = this.codeRepository
+      .createQueryBuilder('code')
+      .leftJoinAndSelect('code.status', 'status')
+      .leftJoinAndSelect('code.company', 'company')
+      .leftJoinAndSelect('code.resource', 'resource')
+      .leftJoinAndSelect('code.user', 'user');
+
+    // Filtra somente códigos que possuem resourceId definido
+    qb.andWhere('code.resourceId IS NOT NULL');
+
+    // Filtra para a mesma empresa do usuário logado
+    qb.andWhere('code.companyId = :companyId', { companyId });
+
+    // Aplica os filtros dinâmicos
+    searchQuery.params.forEach((criteria, index) => {
+      const paramName = `param${index}`;
+      if (criteria.operator === ':') {
+        qb.andWhere(`code.${criteria.key} = :${paramName}`, {
+          [paramName]: criteria.value,
+        });
+      } else if (criteria.operator === '>') {
+        qb.andWhere(`code.${criteria.key} > :${paramName}`, {
+          [paramName]: criteria.value,
+        });
+      } else if (criteria.operator === '<') {
+        qb.andWhere(`code.${criteria.key} < :${paramName}`, {
+          [paramName]: criteria.value,
+        });
+      }
+    });
+
+    if (searchQuery.sort.length > 0) {
+      searchQuery.sort.forEach((sortStr) => {
+        const [key, order] = sortStr.split(':');
+        qb.addOrderBy(`code.${key}`, order as 'ASC' | 'DESC');
+      });
+    } else {
+      qb.addOrderBy('code.createdAt', 'DESC');
+    }
+
+    // Paginação
+    qb.skip((searchQuery.page - 1) * searchQuery.size).take(searchQuery.size);
+
+    const [data, total] = await qb.getManyAndCount();
+    return {
+      data,
+      total,
+      page: searchQuery.page,
+      size: searchQuery.size,
+    };
+  }
+
   async findAll(
     queryParams: Partial<{
       page: number;

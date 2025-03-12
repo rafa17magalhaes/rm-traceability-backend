@@ -8,6 +8,7 @@ import {
   Req,
   UseGuards,
   Query,
+  NotFoundException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CodeService } from '../services/code.service';
@@ -44,14 +45,38 @@ export class CodeController {
     };
     return this.codeService.findAll(convertedQuery);
   }
+
+  @Get('inventory')
+  async findInventoryCodes(
+    @Query() query: QueryParams,
+    @Req() req: Request,
+  ): Promise<PaginationDTO<Code>> {
+    const user = req.user as UserPayload;
+    const companyId = user?.companyId;
+    if (!companyId) {
+      throw new NotFoundException('ERRO: Código não possui companyId');
+    }
+    const convertedQuery: Partial<{
+      page: number;
+      search: string;
+      sort: string;
+      size: number;
+    }> = {
+      page: query.page ? Number(query.page) : 1,
+      search: query.search || '',
+      sort: query.sort || '',
+      size: query.size ? Number(query.size) : 20,
+    };
+    return this.codeService.findInventoryCodes(companyId, convertedQuery);
+  }
+
   @Post('bulk-generate')
   bulkGenerate(
     @Body() dto: BulkGenerateCodesDTO,
     @Req() req: Request,
   ): Promise<Code[]> {
     const user = req.user as UserPayload;
-    const companyId = user?.companyId; // Capturamos o companyId do usuário logado
-    // Acrescentamos companyId ao DTO e repassamos para o serviço
+    const companyId = user?.companyId;
     return this.codeService.bulkGenerateCodes({ ...dto, companyId });
   }
 
