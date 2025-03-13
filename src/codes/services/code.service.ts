@@ -155,6 +155,8 @@ export class CodeService {
     userId?: string,
     resourceId?: string,
     companyId?: string,
+    longitude?: number,
+    latitude?: number,
   ): Promise<Code> {
     const code = await this.codeRepository.findOne({ where: { id: codeId } });
     if (!code) {
@@ -186,6 +188,8 @@ export class CodeService {
       userId: userId && userId.trim() !== '' ? userId : undefined,
       companyId: sanitizedCompanyId || code.companyId,
       resourceId: sanitizedResourceId,
+      longitude,
+      latitude,
     };
 
     const event = this.eventRepository.create(createEventDto);

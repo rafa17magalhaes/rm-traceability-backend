@@ -19,6 +19,7 @@ import { Request } from 'express';
 import { UserPayload } from 'src/auth/types/ExpressUserRequest';
 import PaginationDTO from 'src/shared/dtos/PaginationDTO';
 import { QueryParams } from 'src/shared/query/GenericQueryList';
+import { ChangeCodeStatusDTO } from 'src/events/dtos/change-code-status.dto';
 
 @Controller('codes')
 @UseGuards(AuthGuard('jwt'))
@@ -84,7 +85,8 @@ export class CodeController {
   async changeStatus(
     @Param('id') codeId: string,
     @Body()
-    body: { statusId: string; observation?: string; resourceId?: string },
+    @Body()
+    dto: ChangeCodeStatusDTO,
     @Req() req: Request,
   ): Promise<Code> {
     const user = req.user as UserPayload;
@@ -92,11 +94,13 @@ export class CodeController {
     const userCompanyId = user?.companyId;
     return this.codeService.changeCodeStatus(
       codeId,
-      body.statusId,
-      body.observation,
+      dto.statusId,
+      dto.observation,
       userId,
-      body.resourceId,
+      dto.resourceId,
       userCompanyId,
+      dto.longitude,
+      dto.latitude,
     );
   }
 }
