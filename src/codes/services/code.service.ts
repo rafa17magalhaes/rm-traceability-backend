@@ -201,6 +201,17 @@ export class CodeService {
     return this.codeRepository.save(code);
   }
 
+  private generateCodeValue(prefix: string): string {
+    const usedPrefix = prefix || 'RM7';
+    const randomHex = crypto.randomBytes(4).toString('hex').toUpperCase();
+    const neededHex = randomHex.slice(0, 7);
+    return `${usedPrefix}${neededHex}`;
+  }
+
+  private async generateQrCodeUrl(codeValue: string): Promise<string> {
+    return QRCode.toDataURL(codeValue);
+  }
+
   /**
    * Gera códigos em lote e registra um evento "Gerado" para cada código.
    */
@@ -236,16 +247,5 @@ export class CodeService {
     }
 
     return generatedCodes;
-  }
-
-  private generateCodeValue(prefix: string): string {
-    const usedPrefix = prefix || 'RM7';
-    const randomHex = crypto.randomBytes(4).toString('hex').toUpperCase();
-    const neededHex = randomHex.slice(0, 7);
-    return `${usedPrefix}${neededHex}`;
-  }
-
-  private async generateQrCodeUrl(codeValue: string): Promise<string> {
-    return QRCode.toDataURL(codeValue);
   }
 }
