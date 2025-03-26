@@ -76,4 +76,7 @@ export class Event {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @Column({ name: 'is_read', type: 'boolean', default: false })
+  isRead: boolean;
 }

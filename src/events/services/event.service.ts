@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { Event } from '../entities/event.entity';
 import { EventRepositoryType } from '../interfaces/event-repository.type';
@@ -37,7 +37,7 @@ export class EventService {
       .leftJoinAndSelect('event.code', 'code')
       .leftJoinAndSelect('code.resource', 'codeResource');
 
-    // Aplica os filtros dinâmicos baseados nos parâmetros de SearchQuery
+    // Filtros dinâmicos (searchQuery)
     searchQuery.params.forEach((criteria, index) => {
       const paramName = `param${index}`;
       if (criteria.operator === ':') {
@@ -55,6 +55,7 @@ export class EventService {
       }
     });
 
+    // Ordenação
     if (searchQuery.sort.length > 0) {
       searchQuery.sort.forEach((sortStr) => {
         const [key, order] = sortStr.split(':');
@@ -64,12 +65,13 @@ export class EventService {
       qb.addOrderBy('event.createdAt', 'DESC');
     }
 
-    // Aplica paginação
+    // Paginação
     qb.skip((searchQuery.page - 1) * searchQuery.size).take(searchQuery.size);
 
     const [data, total] = await qb.getManyAndCount();
 
     data.forEach((event) => {
+      // Ajuste se precisar setar resourceId a partir do code.resourceId
       if (event.code?.resourceId) {
         event.resourceId = event.code.resourceId;
       }
@@ -89,5 +91,19 @@ export class EventService {
 
   async findByStatusId(statusId: string): Promise<Event[]> {
     return this.eventRepository.findByStatusId(statusId);
+  }
+
+  // Método para marcar como lido
+  async markAsRead(eventId: string): Promise<Event> {
+    const event = await this.eventRepository.findOne({
+      where: { id: eventId },
+    });
+
+    if (!event) {
+      throw new NotFoundException(`Evento ${eventId} não encontrado`);
+    }
+    // Seta como lido e salva no banco
+    event.isRead = true;
+    return this.eventRepository.save(event);
   }
 }

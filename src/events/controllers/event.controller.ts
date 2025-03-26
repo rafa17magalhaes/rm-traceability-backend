@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Body,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { EventService } from '../services/event.service';
 import { CreateEventDTO } from '../dtos/create-event.dto';
 import { Event } from '../entities/event.entity';
@@ -33,5 +41,11 @@ export class EventController {
   @Get('/by-status')
   findByStatusId(@Query('statusId') statusId: string): Promise<Event[]> {
     return this.eventService.findByStatusId(statusId);
+  }
+
+  // Endpoint para marcar como lido
+  @Patch(':id/mark-as-read')
+  markAsRead(@Param('id') id: string): Promise<Event> {
+    return this.eventService.markAsRead(id);
   }
 }
