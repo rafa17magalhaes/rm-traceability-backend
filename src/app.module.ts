@@ -10,6 +10,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { EventModule } from './events/events.module';
 import { CodeModule } from './codes/codes.module';
+import { ChatIntegrationModule } from './chat-integration/chat-integration.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { CodeModule } from './codes/codes.module';
     EventModule,
     CodeModule,
     AuthModule,
+    ChatIntegrationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

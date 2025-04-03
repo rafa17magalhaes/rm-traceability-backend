@@ -31,7 +31,7 @@ services:
       DB_NAME: rastreabilidade_saas
       JWT_SECRET: RmS@as2025!SecureJWTSecret
       APP_SECRET: dc55cd2760e51f279b2fdb66da91436d
-      APP_PORT: 3001       # <-- Lê esta variável no main.ts
+      APP_PORT: 3001
       NODE_ENV: development
     ports:
       - "3001:3001"        # Mapeia a porta 3001 do host -> container
