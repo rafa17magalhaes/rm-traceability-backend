@@ -1,43 +1,22 @@
 /* eslint-disable prettier/prettier */
-import { Injectable, HttpException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
-import { lastValueFrom } from 'rxjs';
-import { AxiosResponse } from 'axios';
-import { ChatDTO } from '../dtos/chat.dto';
-import { ChatResponseDTO } from '../dtos/chat.response.dto';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class ChatIntegrationService {
-  constructor(
-    private readonly httpService: HttpService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly http: HttpService) {}
 
-  /**
-   * Faz requisição ao micro serviço de Chat (FastAPI).
-   * Recebe um objeto do tipo ChatDTO contendo message e sessionId.
-   */
-  async getChatResponse(chat: ChatDTO): Promise<ChatResponseDTO> {
-    const baseUrl =
-      this.configService.get<string>('CHAT_MICROSERVICE_URL') ||
-      'http://localhost:8000';
-    let url = `${baseUrl}/chat`;
-
-    if (chat.sessionId) {
-      url += `?session_id=${chat.sessionId}`;
-    }
-
+  async getChatResponse(body: any): Promise<any> {
+    const microServiceUrl = process.env.CHAT_MICRO_URL || 'http://chat-microservice:8000/chat';
+    
     try {
-      const response: AxiosResponse<ChatResponseDTO> = await lastValueFrom(
-        this.httpService.post<ChatResponseDTO>(url, { message: chat.message }),
-      );
+      const response$ = this.http.post(microServiceUrl, body);
+      const response = await firstValueFrom(response$);
       return response.data;
-    } catch (error: any) {
-      throw new HttpException(
-        `Erro ao chamar micro serviço: ${error.message}`,
-        500,
-      );
+    } catch (error) {
+      console.error('[ChatIntegrationService] Erro ao chamar microserviço de chat:', error?.message);
+      throw error;
     }
   }
 }

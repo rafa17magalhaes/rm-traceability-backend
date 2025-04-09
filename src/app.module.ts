@@ -11,6 +11,7 @@ import { AppService } from './app.service';
 import { EventModule } from './events/events.module';
 import { CodeModule } from './codes/codes.module';
 import { ChatIntegrationModule } from './chat-integration/chat-integration.module';
+import { OrchestrationModule } from './orchestration/orchestration.module';
 
 @Module({
   imports: [
@@ -33,13 +34,14 @@ import { ChatIntegrationModule } from './chat-integration/chat-integration.modul
       }),
     }),
     CompaniesModule,
-    StatusModule,
     UsersModule,
     ResourcesModule,
+    StatusModule,
     EventModule,
     CodeModule,
     AuthModule,
     ChatIntegrationModule,
+    OrchestrationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

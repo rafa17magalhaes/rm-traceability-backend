@@ -5,7 +5,6 @@ import { ConfigModule } from '@nestjs/config';
 import { ChatIntegrationController } from './controllers/chat.controller';
 import { ChatIntegrationService } from './services/chat-integration.service';
 
-
 @Module({
   imports: [HttpModule, ConfigModule],
   providers: [ChatIntegrationService],

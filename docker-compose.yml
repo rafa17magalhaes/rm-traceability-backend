@@ -51,3 +51,4 @@ volumes:
 networks:
   rm_traceability_network:
     driver: bridge
+    external: true
