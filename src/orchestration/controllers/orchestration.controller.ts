@@ -127,4 +127,27 @@ export class OrchestrationController {
 
     return { amount: inventoryPaginated.total };
     }
+
+  /** retorna lista de códigos do inventário para um recurso */
+  @Get('inventory-codes')
+  async getInventoryCodes(
+    @Query('companyId') companyId: string,
+    @Query('resourceName') resourceName: string,
+  ): Promise<{ codes: string[] }> {
+    if (!companyId?.trim())     throw new NotFoundException('companyId não fornecido');
+    if (!resourceName?.trim())  throw new NotFoundException('resourceName não fornecido');
+
+    const resources = await this.resourcesService.findAll();
+    const queryName = this.normalizeString(resourceName);
+    const matching = resources.find(r => this.normalizeString(r.name) === queryName);
+    if (!matching) return { codes: [] };
+
+    const page = await this.codeService.findInventoryCodes(companyId, {
+      page: 1, size: 9999,
+      search: `resourceId:${matching.id}`, sort: '',
+    });
+
+    const codes = page.data.map(c => c.value);
+    return { codes };
   }
+}
