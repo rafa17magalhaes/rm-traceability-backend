@@ -26,11 +26,16 @@ export class OrchestrationController {
     private readonly codeService: CodeService,
   ) {}
 
+  /** Remove acentos, põe em minúsculo e singulariza plural simples */
   private normalizeString(str: string): string {
-    return str
-      .normalize('NFD') // decompõe em caractere base + acentos
-      .replace(/[\u0300-\u036f]/g, '') // remove diacríticos (acentos)
-      .toLowerCase();
+    let out = str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+    // se termina em 's' (e tem >3 letras) corta o plural simples
+    if (out.endsWith('s') && out.length > 3) out = out.slice(0, -1);
+    return out;
   }
    // Retorna dados variados (usuário, empresa, resources, codes etc.)
   @Get('full-data/:userId')
@@ -94,33 +99,25 @@ export class OrchestrationController {
     };
   }
 
-   // Retorna a contagem de codes do tipo "inventário" para uma empresa e um recurso específico.
+  /** Retorna a contagem de itens de um recurso no inventário. */
   @Get('inventory-quantity')
   async getInventoryQuantity(
     @Query('companyId') companyId: string,
     @Query('resourceName') resourceName: string,
   ): Promise<{ amount: number }> {
-    if (!companyId || !companyId.trim()) {
-      throw new NotFoundException('companyId não fornecido');
-    }
-
-    if (!resourceName || !resourceName.trim()) {
-      throw new NotFoundException('resourceName não fornecido');
-    }
+    if (!companyId?.trim()) throw new NotFoundException('companyId não fornecido');
+    if (!resourceName?.trim()) throw new NotFoundException('resourceName não fornecido');
 
     const resources = await this.resourcesService.findAll();
 
     const queryName = this.normalizeString(resourceName);
+    const matchingResource = resources.find(r =>
+      this.normalizeString(r.name) === queryName,
+    );
 
-    const matchingResource = resources.find((r) => {
-      const dbName = this.normalizeString(r.name); 
-      return dbName === queryName;
-    });
+    if (!matchingResource) return { amount: 0 };
 
-    if (!matchingResource) {
-      return { amount: 0 };
-    }
-
+    // pega todos os códigos desse resource
     const inventoryPaginated = await this.codeService.findInventoryCodes(companyId, {
       page: 1,
       size: 9999,
@@ -128,7 +125,6 @@ export class OrchestrationController {
       sort: '',
     });
 
-    const amount = inventoryPaginated.total;
-    return { amount };
+    return { amount: inventoryPaginated.total };
+    }
   }
-}
