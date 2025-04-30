@@ -43,7 +43,12 @@ export class EventController {
     return this.eventService.findByStatusId(statusId);
   }
 
-  // Endpoint para marcar como lido
+  @Get('/unread/count')
+  async getUnreadCount(): Promise<{ count: number }> {
+    const count = await this.eventService.getUnreadCount();
+    return { count };
+  }
+
   @Patch(':id/mark-as-read')
   markAsRead(@Param('id') id: string): Promise<Event> {
     return this.eventService.markAsRead(id);

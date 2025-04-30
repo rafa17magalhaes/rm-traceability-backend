@@ -93,6 +93,13 @@ export class EventService {
     return this.eventRepository.findByStatusId(statusId);
   }
 
+  // Contagem de eventos não lidos
+  async getUnreadCount(): Promise<number> {
+    return this.eventRepository.count({
+      where: { isRead: false },
+    });
+  }
+
   // Método para marcar como lido
   async markAsRead(eventId: string): Promise<Event> {
     const event = await this.eventRepository.findOne({
