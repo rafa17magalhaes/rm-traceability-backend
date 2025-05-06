@@ -84,21 +84,19 @@ export class CodeController {
   @Patch(':id/move')
   async changeStatus(
     @Param('id') codeId: string,
-    @Body()
-    @Body()
-    dto: ChangeCodeStatusDTO,
+    @Body() dto: ChangeCodeStatusDTO,
     @Req() req: Request,
-  ): Promise<Code> {
+  ) {
     const user = req.user as UserPayload;
-    const userId = user?.id;
-    const userCompanyId = user?.companyId;
+    const effectiveUserId = dto.userId?.trim() ? dto.userId : user.id;
+
     return this.codeService.changeCodeStatus(
       codeId,
       dto.statusId,
       dto.observation,
-      userId,
+      effectiveUserId,
       dto.resourceId,
-      userCompanyId,
+      user.companyId,
       dto.longitude,
       dto.latitude,
     );
