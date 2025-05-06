@@ -26,8 +26,12 @@ export class UsersController {
     @Body() createUserDTO: CreateUserDTO,
     @Req() request,
   ): Promise<User> {
-    const companyId = request.user.companyId;
-    return await this.usersService.create(createUserDTO, companyId);
+    // companyId que vem no payload (caso de criação junto com a empresa)
+    // ou fallback para o companyId do usuário autenticado
+    const loggedCompanyId = request.user.companyId;
+    const companyIdToUse = createUserDTO.companyId ?? loggedCompanyId;
+
+    return this.usersService.create(createUserDTO, companyIdToUse);
   }
 
   @Get()
