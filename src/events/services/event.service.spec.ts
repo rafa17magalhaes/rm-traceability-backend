@@ -1,149 +1,150 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { EventService } from './event.service';
-import { EventRepositoryType } from '../interfaces/event-repository.type';
-import { Event } from '../entities/event.entity';
+import { EventService } from '../services/event.service';
 import { CreateEventDTO } from '../dtos/create-event.dto';
+import { Event } from '../entities/event.entity';
+import { QueryParams } from 'src/shared/query/GenericQueryList';
+import PaginationDTO from 'src/shared/dtos/PaginationDTO';
+import { EventController } from '../controllers/event.controller';
 
-describe('EventService', () => {
-  let service: EventService;
-  let repoMock: jest.Mocked<EventRepositoryType>;
+describe('EventController', () => {
+  let controller: EventController;
+  let serviceMock: jest.Mocked<EventService>;
 
   beforeEach(async () => {
-    const mockRepo = {
+    const mockService = {
       create: jest.fn(),
-      save: jest.fn(),
-      find: jest.fn(),
+      findAll: jest.fn(),
       findByCodeId: jest.fn(),
       findByStatusId: jest.fn(),
+      getUnreadCount: jest.fn(),
+      markAsRead: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [EventController],
       providers: [
-        EventService,
         {
-          provide: 'EventRepository',
-          useValue: mockRepo,
+          provide: EventService,
+          useValue: mockService,
         },
       ],
     }).compile();
 
-    service = module.get<EventService>(EventService);
-    repoMock = module.get<EventRepositoryType>(
-      'EventRepository',
-    ) as jest.Mocked<EventRepositoryType>;
+    controller = module.get<EventController>(EventController);
+    serviceMock = module.get<EventService>(
+      EventService,
+    ) as jest.Mocked<EventService>;
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(controller).toBeDefined();
   });
 
   describe('create', () => {
-    it('should create an event successfully', async () => {
+    it('deve chamar service.create e retornar o event', async () => {
       const dto: CreateEventDTO = {
-        statusId: 'status-1',
-        codeId: 'code-1',
+        statusId: 's1',
+        codeId: 'c1',
         ip: '127.0.0.1',
-        companyId: 'company-1',
-        urlCode: 'url-code-1',
-        observation: 'Test observation',
-        longitude: 1.23,
-        latitude: 4.56,
-        resourceId: 'resource-1',
-        userId: 'user-1',
+        companyId: 'comp1',
+        urlCode: 'url',
+        observation: 'obs',
+        longitude: 1,
+        latitude: 2,
+        resourceId: 'r1',
+        userId: 'u1',
+        valueCode: 'v1',
       };
-
-      const event: Event = {
-        id: 'uuid-1',
+      const eventStub: Event = {
+        id: 'e1',
         ...dto,
-        creationDate: new Date(),
+        createdAt: new Date(),
         updatedAt: new Date(),
+        isRead: false,
       } as Event;
 
-      repoMock.create.mockReturnValue(event);
-      repoMock.save.mockResolvedValue(event);
+      serviceMock.create.mockResolvedValue(eventStub);
+      const result = await controller.create(dto);
 
-      const result = await service.create(dto);
-      expect(repoMock.create).toHaveBeenCalledWith(dto);
-      expect(repoMock.save).toHaveBeenCalledWith(event);
-      expect(result.id).toEqual('uuid-1');
+      expect(serviceMock.create).toHaveBeenCalledWith(dto);
+      expect(result).toBe(eventStub);
     });
   });
 
   describe('findAll', () => {
-    it('should return all events', async () => {
-      const events: Event[] = [
-        {
-          id: 'uuid-1',
-          statusId: 'status-1',
-          codeId: 'code-1',
-          ip: '127.0.0.1',
-          companyId: 'company-1',
-          urlCode: 'url-code-1',
-          observation: 'Test observation',
-          longitude: 1.23,
-          latitude: 4.56,
-          resourceId: 'resource-1',
-          userId: 'user-1',
-          creationDate: new Date(),
-          updatedAt: new Date(),
-        } as Event,
-      ];
-      repoMock.find.mockResolvedValue(events);
-      const result = await service.findAll();
-      expect(repoMock.find).toHaveBeenCalled();
-      expect(result).toEqual(events);
+    it('deve chamar service.findAll e retornar pagina convertida', async () => {
+      const query: QueryParams = {
+        page: '2',
+        size: '5',
+        search: 'foo',
+        sort: 'bar:DESC',
+      };
+      const events: Event[] = [{ id: 'e1' } as Event];
+      const paginated: PaginationDTO<Event> = {
+        data: events,
+        total: 1,
+        page: 2,
+        size: 5,
+      };
+
+      serviceMock.findAll.mockResolvedValue(paginated);
+      const result = await controller.findAll(query);
+
+      expect(serviceMock.findAll).toHaveBeenCalledWith({
+        page: 2,
+        search: 'foo',
+        sort: 'bar:DESC',
+        size: 5,
+      });
+      expect(result).toBe(paginated);
     });
   });
 
   describe('findByCodeId', () => {
-    it('should return events matching the given codeId', async () => {
-      const events: Event[] = [
-        {
-          id: 'uuid-1',
-          statusId: 'status-1',
-          codeId: 'code-1',
-          ip: '127.0.0.1',
-          companyId: 'company-1',
-          urlCode: 'url-code-1',
-          observation: 'Test observation',
-          longitude: 1.23,
-          latitude: 4.56,
-          resourceId: 'resource-1',
-          userId: 'user-1',
-          creationDate: new Date(),
-          updatedAt: new Date(),
-        } as Event,
-      ];
-      repoMock.findByCodeId.mockResolvedValue(events);
-      const result = await service.findByCodeId('code-1');
-      expect(repoMock.findByCodeId).toHaveBeenCalledWith('code-1');
-      expect(result).toEqual(events);
+    it('deve chamar service.findByCodeId e retornar lista de eventos', async () => {
+      const codeId = 'code-123';
+      const events: Event[] = [{ id: 'e2' } as Event];
+
+      serviceMock.findByCodeId.mockResolvedValue(events);
+      const result = await controller.findByCodeId(codeId);
+
+      expect(serviceMock.findByCodeId).toHaveBeenCalledWith(codeId);
+      expect(result).toBe(events);
     });
   });
 
   describe('findByStatusId', () => {
-    it('should return events matching the given statusId', async () => {
-      const events: Event[] = [
-        {
-          id: 'uuid-1',
-          statusId: 'status-1',
-          codeId: 'code-1',
-          ip: '127.0.0.1',
-          companyId: 'company-1',
-          urlCode: 'url-code-1',
-          observation: 'Test observation',
-          longitude: 1.23,
-          latitude: 4.56,
-          resourceId: 'resource-1',
-          userId: 'user-1',
-          creationDate: new Date(),
-          updatedAt: new Date(),
-        } as Event,
-      ];
-      repoMock.findByStatusId.mockResolvedValue(events);
-      const result = await service.findByStatusId('status-1');
-      expect(repoMock.findByStatusId).toHaveBeenCalledWith('status-1');
-      expect(result).toEqual(events);
+    it('deve chamar service.findByStatusId e retornar lista de eventos', async () => {
+      const statusId = 'status-456';
+      const events: Event[] = [{ id: 'e3' } as Event];
+
+      serviceMock.findByStatusId.mockResolvedValue(events);
+      const result = await controller.findByStatusId(statusId);
+
+      expect(serviceMock.findByStatusId).toHaveBeenCalledWith(statusId);
+      expect(result).toBe(events);
+    });
+  });
+
+  describe('getUnreadCount', () => {
+    it('deve chamar service.getUnreadCount e retornar objeto { count }', async () => {
+      serviceMock.getUnreadCount.mockResolvedValue(7);
+      const result = await controller.getUnreadCount();
+
+      expect(serviceMock.getUnreadCount).toHaveBeenCalled();
+      expect(result).toEqual({ count: 7 });
+    });
+  });
+
+  describe('markAsRead', () => {
+    it('deve chamar service.markAsRead e retornar o evento atualizado', async () => {
+      const event: Event = { id: 'e4', isRead: true } as Event;
+      serviceMock.markAsRead.mockResolvedValue(event);
+
+      const result = await controller.markAsRead('e4');
+
+      expect(serviceMock.markAsRead).toHaveBeenCalledWith('e4');
+      expect(result).toBe(event);
     });
   });
 });

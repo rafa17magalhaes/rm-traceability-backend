@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
 import { StatusController } from './status.controller';
 import { StatusService } from '../services/status.service';
@@ -30,9 +31,7 @@ describe('StatusController', () => {
     }).compile();
 
     controller = module.get<StatusController>(StatusController);
-    serviceMock = module.get<StatusService>(
-      StatusService,
-    ) as jest.Mocked<StatusService>;
+    serviceMock = module.get<StatusService>(StatusService) as any;
   });
 
   it('should be defined', () => {
@@ -43,47 +42,57 @@ describe('StatusController', () => {
     const dto: CreateStatusDTO = {
       name: 'Teste',
       description: 'Descrição de teste',
-      companyId: 'company-id-1',
+      companyId: 'comp1',
       active: true,
     };
-    const status: Status = {
+    const fakeReq: any = { user: { companyId: 'comp1' } };
+    const statusStub: any = {
       id: 'uuid-1',
+      userId: 'user-1',
       ...dto,
       resource: undefined,
-    } as Status;
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
 
-    serviceMock.create.mockResolvedValue(status);
-    const result = await controller.create(dto);
+    serviceMock.create.mockResolvedValue(statusStub);
+    const result = await controller.create(dto, fakeReq);
 
-    expect(serviceMock.create).toHaveBeenCalledWith(dto);
+    // Agora espera um único objeto contendo dto + companyId
+    expect(serviceMock.create).toHaveBeenCalledWith({
+      ...dto,
+      companyId: 'comp1',
+    });
     expect(result.id).toBe('uuid-1');
   });
 
-  it('findAll - deve chamar o service e retornar uma lista de status', async () => {
-    const statuses: Status[] = [
+  it('findAll - deve chamar o service e retornar lista', async () => {
+    const list: Status[] = [
       {
-        id: 'uuid-1',
-        name: 'Status 1',
-        description: 'Desc 1',
-        companyId: 'comp1',
+        id: '1',
+        name: 'S1',
+        description: '',
+        companyId: 'c1',
         active: true,
         resource: undefined,
-      } as Status,
+        userId: 'u1',
+      } as any,
       {
-        id: 'uuid-2',
-        name: 'Status 2',
-        description: 'Desc 2',
-        companyId: 'comp2',
+        id: '2',
+        name: 'S2',
+        description: '',
+        companyId: 'c2',
         active: false,
         resource: undefined,
-      } as Status,
+        userId: 'u2',
+      } as any,
     ];
 
-    serviceMock.findAll.mockResolvedValue(statuses);
+    serviceMock.findAll.mockResolvedValue(list);
     const result = await controller.findAll();
 
     expect(serviceMock.findAll).toHaveBeenCalled();
-    expect(result.length).toBe(2);
+    expect(result).toHaveLength(2);
   });
 
   it('findActive - deve chamar o service e retornar apenas status ativos', async () => {
