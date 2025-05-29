@@ -40,17 +40,22 @@ describe('UsersService', () => {
 
   describe('create', () => {
     it('deve lançar ConflictException se o e-mail já existir', async () => {
+      // Simula que já existe um usuário com o mesmo e-mail
       repoMock.findOne.mockResolvedValue({
         id: 'uuid-1',
         email: 'teste@teste.com',
       } as User);
 
       await expect(
-        service.create({
-          name: 'Teste',
-          email: 'teste@teste.com',
-          password: '123',
-        }),
+        service.create(
+          {
+            name: 'Teste',
+            email: 'teste@teste.com',
+            password: '123',
+            phone: '43434343',
+          },
+          'company-1', // <— agora passando companyId
+        ),
       ).rejects.toThrow(ConflictException);
     });
 
@@ -59,11 +64,16 @@ describe('UsersService', () => {
       repoMock.create.mockReturnValue({ id: 'uuid-2' } as User);
       repoMock.save.mockResolvedValue({ id: 'uuid-2' } as User);
 
-      const result = await service.create({
-        name: 'Novo',
-        email: 'novo@teste.com',
-        password: '123',
-      });
+      const result = await service.create(
+        {
+          name: 'Novo',
+          email: 'novo@teste.com',
+          password: '123',
+          phone: '3253467',
+        },
+        'company-1',
+      );
+
       expect(repoMock.findOne).toHaveBeenCalled();
       expect(repoMock.create).toHaveBeenCalled();
       expect(repoMock.save).toHaveBeenCalled();

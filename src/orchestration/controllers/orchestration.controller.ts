@@ -1,5 +1,10 @@
-/* eslint-disable prettier/prettier */
-import { Controller, Get, Param, NotFoundException, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  NotFoundException,
+  Query,
+} from '@nestjs/common';
 import { CompaniesService } from 'src/companies/services/companies.service';
 import { UsersService } from 'src/users/services/users.service';
 import { ResourcesService } from 'src/resources/services/resources.service';
@@ -37,11 +42,9 @@ export class OrchestrationController {
     if (out.endsWith('s') && out.length > 3) out = out.slice(0, -1);
     return out;
   }
-   // Retorna dados variados (usuário, empresa, resources, codes etc.)
+  // Retorna dados variados (usuário, empresa, resources, codes etc.)
   @Get('full-data/:userId')
-  async getFullData(
-    @Param('userId') userId: string,
-  ): Promise<{
+  async getFullData(@Param('userId') userId: string): Promise<{
     user: User;
     company: Company | null;
     resources: Resource[];
@@ -80,12 +83,15 @@ export class OrchestrationController {
 
     let inventoryCodes: PaginationDTO<Code> | null = null;
     if (user.companyId) {
-      inventoryCodes = await this.codeService.findInventoryCodes(user.companyId, {
-        page: 1,
-        search: '',
-        sort: '',
-        size: 50,
-      });
+      inventoryCodes = await this.codeService.findInventoryCodes(
+        user.companyId,
+        {
+          page: 1,
+          search: '',
+          sort: '',
+          size: 50,
+        },
+      );
     }
 
     return {
@@ -105,28 +111,33 @@ export class OrchestrationController {
     @Query('companyId') companyId: string,
     @Query('resourceName') resourceName: string,
   ): Promise<{ amount: number }> {
-    if (!companyId?.trim()) throw new NotFoundException('companyId não fornecido');
-    if (!resourceName?.trim()) throw new NotFoundException('resourceName não fornecido');
+    if (!companyId?.trim())
+      throw new NotFoundException('companyId não fornecido');
+    if (!resourceName?.trim())
+      throw new NotFoundException('resourceName não fornecido');
 
     const resources = await this.resourcesService.findAll();
 
     const queryName = this.normalizeString(resourceName);
-    const matchingResource = resources.find(r =>
-      this.normalizeString(r.name) === queryName,
+    const matchingResource = resources.find(
+      (r) => this.normalizeString(r.name) === queryName,
     );
 
     if (!matchingResource) return { amount: 0 };
 
     // pega todos os códigos desse resource
-    const inventoryPaginated = await this.codeService.findInventoryCodes(companyId, {
-      page: 1,
-      size: 9999,
-      search: `resourceId:${matchingResource.id}`,
-      sort: '',
-    });
+    const inventoryPaginated = await this.codeService.findInventoryCodes(
+      companyId,
+      {
+        page: 1,
+        size: 9999,
+        search: `resourceId:${matchingResource.id}`,
+        sort: '',
+      },
+    );
 
     return { amount: inventoryPaginated.total };
-    }
+  }
 
   /** retorna lista de códigos do inventário para um recurso */
   @Get('inventory-codes')
@@ -134,20 +145,26 @@ export class OrchestrationController {
     @Query('companyId') companyId: string,
     @Query('resourceName') resourceName: string,
   ): Promise<{ codes: string[] }> {
-    if (!companyId?.trim())     throw new NotFoundException('companyId não fornecido');
-    if (!resourceName?.trim())  throw new NotFoundException('resourceName não fornecido');
+    if (!companyId?.trim())
+      throw new NotFoundException('companyId não fornecido');
+    if (!resourceName?.trim())
+      throw new NotFoundException('resourceName não fornecido');
 
     const resources = await this.resourcesService.findAll();
     const queryName = this.normalizeString(resourceName);
-    const matching = resources.find(r => this.normalizeString(r.name) === queryName);
+    const matching = resources.find(
+      (r) => this.normalizeString(r.name) === queryName,
+    );
     if (!matching) return { codes: [] };
 
     const page = await this.codeService.findInventoryCodes(companyId, {
-      page: 1, size: 9999,
-      search: `resourceId:${matching.id}`, sort: '',
+      page: 1,
+      size: 9999,
+      search: `resourceId:${matching.id}`,
+      sort: '',
     });
 
-    const codes = page.data.map(c => c.value);
+    const codes = page.data.map((c) => c.value);
     return { codes };
   }
 }

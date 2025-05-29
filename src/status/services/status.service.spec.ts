@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StatusService } from './status.service';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, ConflictException } from '@nestjs/common';
 import { Status } from '../entities/status.entity';
 import { StatusRepositoryType } from '../interfaces/status-repository.type';
 import { CreateStatusDTO } from '../dtos/create-status.dto';
@@ -11,7 +11,7 @@ describe('StatusService', () => {
   let repoMock: jest.Mocked<StatusRepositoryType>;
 
   beforeEach(async () => {
-    const mockRepo = {
+    const mockRepo: Partial<jest.Mocked<StatusRepositoryType>> = {
       create: jest.fn(),
       save: jest.fn(),
       find: jest.fn(),
@@ -31,9 +31,7 @@ describe('StatusService', () => {
     }).compile();
 
     service = module.get<StatusService>(StatusService);
-    repoMock = module.get<StatusRepositoryType>(
-      'StatusRepository',
-    ) as jest.Mocked<StatusRepositoryType>;
+    repoMock = module.get('StatusRepository');
   });
 
   it('should be defined', () => {
@@ -41,71 +39,87 @@ describe('StatusService', () => {
   });
 
   describe('create', () => {
+    it('deve lançar conflito se companyId vazio', async () => {
+      const dto = { name: 'X', description: '', companyId: '', active: true };
+      await expect(service.create(dto as any)).rejects.toThrow(
+        ConflictException,
+      );
+    });
+
+    it('deve lançar conflito se já existir status com mesmo nome e empresa', async () => {
+      const dto: CreateStatusDTO = {
+        name: 'Teste',
+        description: 'Desc',
+        companyId: 'c1',
+        active: true,
+      };
+      repoMock.findOne.mockResolvedValue({} as Status);
+      await expect(service.create(dto)).rejects.toThrow(ConflictException);
+    });
+
     it('deve criar um status com sucesso', async () => {
       const dto: CreateStatusDTO = {
         name: 'Teste',
-        description: 'Desc de teste',
-        companyId: 'comp1',
+        description: 'Desc',
+        companyId: 'c1',
         active: true,
       };
-      const status: Status = {
+      const statusStub = {
         id: 'uuid-1',
         ...dto,
         resource: undefined,
-      } as Status;
+      } as unknown as Status;
 
-      repoMock.create.mockReturnValue(status);
-      repoMock.save.mockResolvedValue(status);
+      repoMock.create.mockReturnValue(statusStub);
+      repoMock.save.mockResolvedValue(statusStub);
 
       const result = await service.create(dto);
       expect(repoMock.create).toHaveBeenCalledWith(dto);
-      expect(repoMock.save).toHaveBeenCalledWith(status);
+      expect(repoMock.save).toHaveBeenCalledWith(statusStub);
       expect(result.id).toBe('uuid-1');
     });
   });
 
   describe('findAll', () => {
     it('deve retornar todos os status', async () => {
-      const statuses: Status[] = [
+      const list: Status[] = [
         {
-          id: 'uuid-1',
-          name: 'Status 1',
-          description: 'Desc 1',
-          companyId: 'comp1',
+          id: '1',
+          name: 'A',
+          description: '',
+          companyId: 'c1',
           active: true,
           resource: undefined,
         } as Status,
         {
-          id: 'uuid-2',
-          name: 'Status 2',
-          description: 'Desc 2',
-          companyId: 'comp2',
+          id: '2',
+          name: 'B',
+          description: '',
+          companyId: 'c2',
           active: false,
           resource: undefined,
         } as Status,
       ];
-      repoMock.find.mockResolvedValue(statuses);
-
+      repoMock.find.mockResolvedValue(list);
       const result = await service.findAll();
       expect(repoMock.find).toHaveBeenCalled();
-      expect(result.length).toBe(2);
+      expect(result).toEqual(list);
     });
   });
 
   describe('findActive', () => {
-    it('deve retornar somente os status ativos', async () => {
-      const statuses: Status[] = [
+    it('deve retornar somente status ativos', async () => {
+      const activeList: Status[] = [
         {
-          id: 'uuid-1',
-          name: 'Status 1',
-          description: 'Desc 1',
-          companyId: 'comp1',
+          id: '1',
+          name: 'A',
+          description: '',
+          companyId: 'c1',
           active: true,
           resource: undefined,
         } as Status,
       ];
-      repoMock.findActiveStatuses.mockResolvedValue(statuses);
-
+      repoMock.findActiveStatuses.mockResolvedValue(activeList);
       const result = await service.findActive();
       expect(repoMock.findActiveStatuses).toHaveBeenCalled();
       expect(result.every((s) => s.active)).toBe(true);
@@ -113,75 +127,97 @@ describe('StatusService', () => {
   });
 
   describe('findOne', () => {
-    it('deve lançar NotFoundException se o status não for encontrado', async () => {
+    it('deve lançar NotFoundException se não encontrar', async () => {
       repoMock.findOne.mockResolvedValue(null);
-      await expect(service.findOne('invalid-id')).rejects.toThrow(
+      await expect(service.findOne('bad-id')).rejects.toThrow(
         NotFoundException,
       );
     });
 
     it('deve retornar um status se encontrado', async () => {
-      const status: Status = {
+      const statusStub: Status = {
         id: 'uuid-1',
-        name: 'Status 1',
-        description: 'Desc 1',
-        companyId: 'comp1',
+        name: 'S1',
+        description: 'Desc',
+        companyId: 'c1',
         active: true,
         resource: undefined,
       } as Status;
-      repoMock.findOne.mockResolvedValue(status);
+      repoMock.findOne.mockResolvedValue(statusStub);
 
       const result = await service.findOne('uuid-1');
       expect(repoMock.findOne).toHaveBeenCalledWith({
         where: { id: 'uuid-1' },
       });
-      expect(result.id).toBe('uuid-1');
+      expect(result).toEqual(statusStub);
+    });
+  });
+
+  describe('findByName', () => {
+    it('deve lançar NotFoundException se não existir', async () => {
+      repoMock.findOne.mockResolvedValue(null);
+      await expect(service.findByName('X')).rejects.toThrow(NotFoundException);
+    });
+
+    it('deve retornar status válido', async () => {
+      const statusStub: Status = {
+        id: 'u1',
+        name: 'X',
+        description: '',
+        companyId: 'c1',
+        active: true,
+        resource: undefined,
+      } as Status;
+      repoMock.findOne.mockResolvedValue(statusStub);
+      const result = await service.findByName('X', 'c1');
+      expect(repoMock.findOne).toHaveBeenCalledWith({
+        where: { name: 'X', companyId: 'c1' },
+      });
+      expect(result).toEqual(statusStub);
     });
   });
 
   describe('update', () => {
     it('deve atualizar e retornar o status atualizado', async () => {
-      const updateDto: UpdateStatusDTO = { name: 'Updated Name' };
-      const status: Status = {
-        id: 'uuid-1',
-        name: 'Old Name',
-        description: 'Desc',
-        companyId: 'comp1',
+      const updateDto: UpdateStatusDTO = { name: 'New Name' };
+      const original: Status = {
+        id: 'u1',
+        name: 'Old',
+        description: 'D',
+        companyId: 'c1',
         active: true,
         resource: undefined,
       } as Status;
-      const updatedStatus: Status = { ...status, ...updateDto };
 
-      repoMock.findOne.mockResolvedValue(status);
+      // findOne retorna o original
+      repoMock.findOne.mockResolvedValue(original);
+      // e save retorna o merged
+      const updatedStatus = { ...original, ...updateDto } as unknown as Status;
       repoMock.save.mockResolvedValue(updatedStatus);
 
-      const result = await service.update('uuid-1', updateDto);
-      expect(repoMock.findOne).toHaveBeenCalledWith({
-        where: { id: 'uuid-1' },
-      });
-      expect(repoMock.save).toHaveBeenCalledWith(status);
-      expect(result.name).toBe('Updated Name');
+      const result = await service.update('u1', updateDto);
+      expect(repoMock.findOne).toHaveBeenCalledWith({ where: { id: 'u1' } });
+      expect(repoMock.save).toHaveBeenCalledWith(original);
+      expect(result.name).toBe('New Name');
     });
   });
 
   describe('remove', () => {
-    it('deve remover o status', async () => {
-      const status: Status = {
-        id: 'uuid-1',
-        name: 'Status 1',
-        description: 'Desc 1',
-        companyId: 'comp1',
+    it('deve remover sem erro', async () => {
+      const stub: Status = {
+        id: 'u1',
+        name: 'X',
+        description: '',
+        companyId: 'c1',
         active: true,
         resource: undefined,
       } as Status;
-      repoMock.findOne.mockResolvedValue(status);
-      repoMock.remove.mockResolvedValue(status);
+      repoMock.findOne.mockResolvedValue(stub);
+      repoMock.remove.mockResolvedValue(stub);
 
-      await service.remove('uuid-1');
-      expect(repoMock.findOne).toHaveBeenCalledWith({
-        where: { id: 'uuid-1' },
-      });
-      expect(repoMock.remove).toHaveBeenCalledWith(status);
+      await service.remove('u1');
+      expect(repoMock.findOne).toHaveBeenCalledWith({ where: { id: 'u1' } });
+      expect(repoMock.remove).toHaveBeenCalledWith(stub);
     });
   });
 });

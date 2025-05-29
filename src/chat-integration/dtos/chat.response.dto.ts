@@ -1,6 +1,4 @@
-/* eslint-disable prettier/prettier */
 export interface ChatResponseDTO {
-    response: string;
-    session_id?: string;
-  }
-  
+  response: string;
+  session_id?: string;
+}

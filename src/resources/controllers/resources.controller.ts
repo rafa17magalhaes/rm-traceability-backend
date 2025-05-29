@@ -43,8 +43,8 @@ export class ResourcesController {
   })
   async create(
     @Body() dto: CreateResourceDTO,
-    @UploadedFile() file: Express.Multer.File,
     @Req() request: ExpressUserRequest,
+    @UploadedFile() file?: Express.Multer.File, // <- opcional agora
   ): Promise<Resource> {
     const user = request.user as UserPayload;
     const companyId = user.companyId;
@@ -99,11 +99,9 @@ export class ResourcesController {
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateResourceDTO,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file?: Express.Multer.File, // <- opcional também
   ): Promise<Resource> {
     let imageUrl: string | undefined;
-
-    // Se o usuário anexar um novo arquivo, faz upload e atualiza a URL
     if (file) {
       imageUrl = await this.awsS3Service.uploadFile(file);
     }
