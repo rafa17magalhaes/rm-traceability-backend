@@ -36,6 +36,17 @@ export class UsersService {
         `Nome ${name} já cadastrado para esta empresa.`,
       );
     }
+
+    // Telefone duplicado
+    if (phone) {
+      const existingByPhone = await this.userRepository.findOne({
+        where: { phone },
+      });
+      if (existingByPhone) {
+        throw new ConflictException(`Telefone ${phone} já cadastrado.`);
+      }
+    }
+
     const user = this.userRepository.create({
       name,
       email,
@@ -44,6 +55,7 @@ export class UsersService {
       password,
       companyId,
     });
+
     await this.userRepository.save(user);
     return user;
   }
@@ -82,7 +94,6 @@ export class UsersService {
     }
   }
 
-  // Método customizado
   async findActiveUsers(): Promise<User[]> {
     return this.userRepository.findActive();
   }

@@ -21,17 +21,12 @@ describe('UsersService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
-        {
-          provide: 'UserRepository',
-          useValue: mockRepo,
-        },
+        { provide: 'UserRepository', useValue: mockRepo },
       ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
-    repoMock = module.get<UserRepositoryType>(
-      'UserRepository',
-    ) as jest.Mocked<UserRepositoryType>;
+    repoMock = module.get('UserRepository') as jest.Mocked<UserRepositoryType>;
   });
 
   it('should be defined', () => {
@@ -40,11 +35,21 @@ describe('UsersService', () => {
 
   describe('create', () => {
     it('deve lançar ConflictException se o e-mail já existir', async () => {
-      // Simula que já existe um usuário com o mesmo e-mail
-      repoMock.findOne.mockResolvedValue({
-        id: 'uuid-1',
-        email: 'teste@teste.com',
-      } as User);
+      repoMock.findOne.mockResolvedValueOnce({ id: 'u-email' } as User);
+
+      await expect(
+        service.create(
+          { name: 'A', email: 'a@a.com', password: '123', phone: '111' },
+          'company-1',
+        ),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('deve lançar ConflictException se o telefone já existir', async () => {
+      repoMock.findOne
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce({ id: 'u-phone' } as User);
 
       await expect(
         service.create(
@@ -54,13 +59,17 @@ describe('UsersService', () => {
             password: '123',
             phone: '43434343',
           },
-          'company-1', // <— agora passando companyId
+          'company-1',
         ),
       ).rejects.toThrow(ConflictException);
     });
 
-    it('deve criar usuário se e-mail ainda não existir', async () => {
-      repoMock.findOne.mockResolvedValue(null);
+    it('deve criar usuário se e-mail/telefone ainda não existirem', async () => {
+      repoMock.findOne
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(null);
+
       repoMock.create.mockReturnValue({ id: 'uuid-2' } as User);
       repoMock.save.mockResolvedValue({ id: 'uuid-2' } as User);
 
@@ -74,7 +83,6 @@ describe('UsersService', () => {
         'company-1',
       );
 
-      expect(repoMock.findOne).toHaveBeenCalled();
       expect(repoMock.create).toHaveBeenCalled();
       expect(repoMock.save).toHaveBeenCalled();
       expect(result.id).toBe('uuid-2');
