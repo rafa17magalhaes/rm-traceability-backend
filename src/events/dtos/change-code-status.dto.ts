@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 export class ChangeCodeStatusDTO {
   statusId: string;
   observation?: string;
