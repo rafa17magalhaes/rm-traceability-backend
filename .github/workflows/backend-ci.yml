@@ -1,94 +1,36 @@
-name: Backend CI/CD
+name: Backend CI
 
-# Dispara em push ou PR para as branches develop e main
+# Executa em push ou pull-request para as branches desejadas
 on:
   push:
-    branches:
-      - develop
-      - main
+    branches: [develop, main]
   pull_request:
-    branches:
-on:
-  push:
-    branches: 
-      - develop
-      - main
-  pull_request:
-    branches: 
-      - develop
-      - main
+    branches: [develop, main]
 
 jobs:
-  # 1) Build, lint e test
   build-and-test:
-    name: 🛠 Build, Lint & Test
-  build-and-test:
+    name: 🛠 Build • Lint • Test
     runs-on: ubuntu-latest
+
     steps:
+      # 1) Faz checkout do código
       - uses: actions/checkout@v3
-      
+
+      # 2) Prepara Node 20
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
+          cache: yarn
 
+      # 3) Instala dependências
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      # 4) Lint
       - name: Lint
         run: yarn lint
 
+      # 5) Testes com cobertura
       - name: Run tests
         run: yarn test:cov
-
-  # 2) Deploy via SSH (rebuild localmente no servidor)
-  deploy:
-    name: 🚀 Deploy to VPS
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v3
-
-      # carrega chave privada
-      - name: Setup SSH Key
-        uses: webfactory/ssh-agent@v0.5.4
-        with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
-
-      # copia o docker-compose (e quaisquer outros arquivos que queira) pro servidor
-      - name: Copy docker-compose.yml
-        run: |
-          scp -P ${{ secrets.SSH_PORT }} docker-compose.yml \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/rm_traceability_back/
-
-      # conecta por SSH e executa o rebuild + up
-      - name: SSH & Deploy
-        run: |
-          ssh -p ${{ secrets.SSH_PORT }} \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-              cd ~/rm_traceability_back
-              # --build força rebuild da imagem local via Dockerfile (ou Dockerfile.dev, conforme seu compose)
-              docker-compose up -d --build app
-            EOF
-
-  docker-build-push:
-    if: github.ref == 'refs/heads/main'
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Docker Hub Login
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USER }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build & Push Docker Image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: Dockerfile
-          push: true
-          tags: your-dockerhub-user/rm-trace-backend:latest

@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { CompaniesModule } from 'src/companies/companies.module';
 import { UsersModule } from 'src/users/users.module';
