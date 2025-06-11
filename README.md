@@ -84,7 +84,9 @@ Acesse http://localhost:3001/api no navegador para visualizar a documentação i
 
 ### Criar a network
 
-docker network create
+Run the following command to create the Docker network:
+
+docker network create rm_traceability_network
 
 Via Docker, utilize o arquivo docker-compose.yml
 
